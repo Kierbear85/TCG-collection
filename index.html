@@ -37,6 +37,7 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -webkit-text-size-adjust: 100%;
+      -webkit-overflow-scrolling: touch;
     }
 
     body::before {
@@ -106,8 +107,6 @@
       background: rgba(10, 10, 15, 0.92);
       backdrop-filter: blur(12px);
       z-index: 100;
-      flex-wrap: wrap;
-      gap: 0.75rem;
     }
 
     .count-badge {
@@ -803,13 +802,15 @@
     }
 
     function extractPrice(card) {
-      const prices = card?.tcgplayer?.prices
+      const prices = card?.pricing?.cardmarket
       if (!prices) return null
 
-      return prices.holofoil?.market
-        || prices.normal?.market
-        || prices.reverseHolofoil?.market
-        || null
+      // Use trend price (recent market price) in EUR, convert to USD approx
+      const eurPrice = prices.trend || prices.avg || prices.avg30
+      if (!eurPrice) return null
+
+      // Convert EUR to USD (approximate)
+      return eurPrice * 1.1
     }
 
     function formatPrice(card) {
@@ -877,29 +878,27 @@
 
     function hydratePrices(cards) {
       cards.forEach(async (card) => {
-        const cardId = card.id || card._index
+        const cardId = card.id || card.cardId || card._index
         const el = document.getElementById(`price-${cardId}`)
         if (!el) return
 
-        // already has inline price
-        let price = extractPrice(card)
-        if (price) {
-          const collector = formatCollectorNumber(card)
-          el.textContent = collector ? `${collector} · $${price.toFixed(2)}` : `$${price.toFixed(2)}`
-          return
-        }
+        // if no card ID, stop here
+        const tcgdexId = card.id || card.cardId
+        if (!tcgdexId) return
 
-        // fetch enriched data
-        const full = await fetchCardDetails(card.id)
+        // try to fetch price data
+        const full = await fetchCardDetails(tcgdexId)
         if (!full) return
 
-        price = extractPrice(full)
-        const collector = formatCollectorNumber(card)
+        // show collector number from TCGDEX data
+        const collector = formatCollectorNumber(full)
+        if (collector) {
+          el.textContent = collector
+        }
 
+        const price = extractPrice(full)
         if (price) {
           el.textContent = collector ? `${collector} · $${price.toFixed(2)}` : `$${price.toFixed(2)}`
-        } else if (collector) {
-          el.textContent = collector
         }
       })
     }
@@ -918,7 +917,7 @@
         ${hasImg ? `<img src="${card.image}" alt="${card.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.no-image').style.display='flex'">` : ''}
         <div class="no-image" style="display:${hasImg ? 'none' : 'flex'}">no image</div>
         <div class="status-dot ${status}"></div>
-        <div class="card-price-hover" id="price-${card.id || card._index}"></div>
+        <div class="card-price-hover" id="price-${card.id || card.cardId || card._index}"></div>
       </div>
       <div class="card-meta">
         <div class="card-name" title="${card.name}">${card.name}</div>
