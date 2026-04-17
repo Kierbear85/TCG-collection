@@ -775,7 +775,10 @@
 
         populateSetFilter()
         render()
-        hydratePrices(allCards)
+
+        // Dedupe cards before hydrating prices
+        const deduped = dedupeCards(allCards)
+        hydratePrices(deduped)
 
       } catch (err) {
         document.getElementById('main').innerHTML = `
@@ -1004,6 +1007,11 @@
     document.getElementById('set-filter').addEventListener('change', e => {
       currentSetFilter = e.target.value
       render()
+
+      // Dedupe and hydrate prices for the filtered set
+      const filtered = currentSetFilter === 'all' ? allCards : allCards.filter(c => c.set === currentSetFilter)
+      const deduped = dedupeCards(filtered)
+      hydratePrices(deduped)
     })
 
     document.querySelectorAll('.pill[data-sort]').forEach(btn => {
@@ -1013,7 +1021,10 @@
         currentSort = btn.dataset.sort
         const filtered = currentSetFilter === 'all' ? allCards : allCards.filter(c => c.set === currentSetFilter)
         render()
-        hydratePrices(filtered)
+
+        // Dedupe cards before hydrating prices
+        const deduped = dedupeCards(filtered)
+        hydratePrices(deduped)
       })
     })
 
