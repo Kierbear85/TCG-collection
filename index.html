@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nug.monster — card collection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg: #0a0a0f;
@@ -18,7 +21,13 @@
       --card-glow: rgba(200, 240, 80, 0.08);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background: var(--bg);
@@ -72,7 +81,9 @@
       letter-spacing: -0.02em;
     }
 
-    h1 span { color: var(--accent); }
+    h1 span {
+      color: var(--accent);
+    }
 
     .subtitle {
       font-size: 0.75rem;
@@ -102,7 +113,10 @@
       white-space: nowrap;
     }
 
-    .count-badge strong { color: var(--accent); font-weight: 400; }
+    .count-badge strong {
+      color: var(--accent);
+      font-weight: 400;
+    }
 
     .control-group {
       display: flex;
@@ -117,7 +131,10 @@
       text-transform: uppercase;
     }
 
-    .pill-group { display: flex; gap: 0.25rem; }
+    .pill-group {
+      display: flex;
+      gap: 0.25rem;
+    }
 
     .pill {
       background: none;
@@ -133,8 +150,15 @@
       white-space: nowrap;
     }
 
-    .pill:hover { border-color: var(--muted); color: var(--text); }
-    .pill.active { border-color: var(--accent); color: var(--accent); }
+    .pill:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    .pill.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
     .set-select {
       background: var(--surface);
@@ -150,8 +174,14 @@
       transition: border-color 0.15s;
     }
 
-    .set-select:focus, .set-select:hover { border-color: var(--accent); }
-    .set-select option { background: var(--surface); }
+    .set-select:focus,
+    .set-select:hover {
+      border-color: var(--accent);
+    }
+
+    .set-select option {
+      background: var(--surface);
+    }
 
     .legend {
       display: flex;
@@ -166,10 +196,22 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .legend-item { display: flex; align-items: center; gap: 0.4rem; }
-    .legend-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
 
-    main { padding: 0 0 4rem; }
+    .legend-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    main {
+      padding: 0 0 4rem;
+    }
 
     .set-group {
       border-bottom: 1px solid var(--border);
@@ -178,7 +220,12 @@
       animation: fadeUp 0.4s ease forwards;
     }
 
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .set-header {
       padding: 1.5rem 2rem 1rem;
@@ -189,7 +236,9 @@
       user-select: none;
     }
 
-    .set-header:hover .set-name { color: var(--accent); }
+    .set-header:hover .set-name {
+      color: var(--accent);
+    }
 
     .set-name {
       font-family: 'Unbounded', sans-serif;
@@ -213,7 +262,9 @@
       transition: color 0.15s;
     }
 
-    .set-header:hover .set-toggle { color: var(--accent); }
+    .set-header:hover .set-toggle {
+      color: var(--accent);
+    }
 
     .set-cards {
       display: grid;
@@ -251,7 +302,7 @@
 
     .card:hover .card-img-wrap {
       border-color: var(--accent);
-      box-shadow: 0 0 20px var(--card-glow), 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px var(--card-glow), 0 8px 24px rgba(0, 0, 0, 0.5);
       transform: translateY(-3px) rotate(-0.4deg);
     }
 
@@ -281,15 +332,30 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.5);
+      border: 1px solid rgba(0, 0, 0, 0.5);
     }
 
-    .status-dot.owned     { background: var(--accent); }
-    .status-dot.for-trade { background: var(--accent2); }
-    .status-dot.wanted    { background: #f05080; }
-    .status-dot.sold      { background: var(--muted); }
+    .status-dot.owned {
+      background: var(--accent);
+    }
 
-    .card-meta { display: flex; flex-direction: column; gap: 0.2rem; }
+    .status-dot.for-trade {
+      background: var(--accent2);
+    }
+
+    .status-dot.wanted {
+      background: #f05080;
+    }
+
+    .status-dot.sold {
+      background: var(--muted);
+    }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
 
     .card-name {
       font-family: 'Unbounded', sans-serif;
@@ -301,7 +367,43 @@
       text-overflow: ellipsis;
     }
 
-    .card-tags { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+    .card-number {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .card-price {
+      font-size: 0.6rem;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+    }
+
+    .card-price-hover {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.7));
+      padding: 0.75rem 0.5rem 0.5rem;
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .card:hover .card-price-hover {
+      opacity: 1;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
 
     .tag {
       font-size: 0.52rem;
@@ -312,9 +414,20 @@
       color: var(--muted);
     }
 
-    .tag.owned     { border-color: var(--accent); color: var(--accent); }
-    .tag.for-trade { border-color: var(--accent2); color: var(--accent2); }
-    .tag.wanted    { border-color: #f05080; color: #f05080; }
+    .tag.owned {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tag.for-trade {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .tag.wanted {
+      border-color: #f05080;
+      color: #f05080;
+    }
 
     .state {
       display: flex;
@@ -338,7 +451,11 @@
       animation: spin 0.7s linear infinite;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     footer {
       padding: 2rem;
@@ -352,177 +469,280 @@
       gap: 0.5rem;
     }
 
-    footer a { color: var(--accent); text-decoration: none; }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
 
     @media (max-width: 520px) {
-      h1 { font-size: 2rem; }
-      .controls { gap: 0.75rem; padding: 1rem; }
-      .set-header { padding: 1.25rem 1rem 0.75rem; }
-      .set-cards { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; padding: 0 1rem 1.25rem; }
+      h1 {
+        font-size: 2rem;
+      }
+
+      .controls {
+        gap: 0.75rem;
+        padding: 1rem;
+      }
+
+      .set-header {
+        padding: 1.25rem 1rem 0.75rem;
+      }
+
+      .set-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.85rem;
+        padding: 0 1rem 1.25rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<header>
-  <span class="site-label">nug.monster / collection</span>
-  <h1>card<br><span>archive</span></h1>
-  <p class="subtitle">pokémon tcg · stored on at protocol · fetched live</p>
-</header>
+  <header>
+    <span class="site-label">nug.monster / collection</span>
+    <h1>card<br><span>archive</span></h1>
+    <p class="subtitle">pokémon tcg · stored on at protocol · fetched live</p>
+  </header>
 
-<div class="controls">
-  <span class="count-badge" id="count-badge">fetching...</span>
+  <div class="controls">
+    <span class="count-badge" id="count-badge">fetching...</span>
 
-  <div class="control-group">
-    <span class="control-label">set</span>
-    <select class="set-select" id="set-filter">
-      <option value="all">all sets</option>
-    </select>
-  </div>
+    <div class="control-group">
+      <span class="control-label">set</span>
+      <select class="set-select" id="set-filter">
+        <option value="all">all sets</option>
+      </select>
+    </div>
 
-  <div class="control-group">
-    <span class="control-label">sort</span>
-    <div class="pill-group">
-      <button class="pill active" data-sort="newest">newest</button>
-      <button class="pill" data-sort="az">a–z</button>
+    <div class="control-group">
+      <span class="control-label">sort</span>
+      <div class="pill-group">
+        <button class="pill active" data-sort="newest">newest</button>
+        <button class="pill" data-sort="az">a–z</button>
+        <button class="pill" data-sort="set">set #</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="legend">
-  <span class="legend-item"><span class="legend-dot" style="background:#c8f050"></span>owned</span>
-  <span class="legend-item"><span class="legend-dot" style="background:#50f0c8"></span>for trade</span>
-  <span class="legend-item"><span class="legend-dot" style="background:#f05080"></span>wanted</span>
-  <span class="legend-item"><span class="legend-dot" style="background:#5a5a7a"></span>sold</span>
-</div>
-
-<main id="main">
-  <div class="state">
-    <div class="spinner"></div>
-    <span>fetching collection from at protocol...</span>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#c8f050"></span>owned</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#50f0c8"></span>for trade</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#f05080"></span>wanted</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#5a5a7a"></span>sold</span>
   </div>
-</main>
 
-<footer>
-  <span>nug.monster · <a href="https://bsky.app/profile/nug.monster" target="_blank">@nug.monster on bluesky</a></span>
-  <span>data via <a href="https://tcgdex.dev" target="_blank">tcgdex</a> · stored on <a href="https://atproto.com" target="_blank">at protocol</a></span>
-</footer>
+  <main id="main">
+    <div class="state">
+      <div class="spinner"></div>
+      <span>fetching collection from at protocol...</span>
+    </div>
+  </main>
 
-<script>
-  const HANDLE = 'nug.monster'
-  const COLLECTION = 'com.kieran.tcg.cardInstance'
-  const API_BASE = `https://bsky.social/xrpc/com.atproto.repo.listRecords?repo=${HANDLE}&collection=${COLLECTION}&limit=100`
+  <footer>
+    <span>nug.monster · <a href="https://bsky.app/profile/nug.monster" target="_blank">@nug.monster on
+        bluesky</a></span>
+    <span>data via <a href="https://tcgdex.dev" target="_blank">tcgdex</a> · stored on <a href="https://atproto.com"
+        target="_blank">at protocol</a></span>
+  </footer>
 
-  let allCards = []
-  let currentSort = 'newest'
-  let currentSetFilter = 'all'
-  let collapsedSets = new Set()
+  <script>
+    const HANDLE = 'nug.monster'
+    const COLLECTION = 'com.kieran.tcg.cardInstance'
+    const API_BASE = `https://bsky.social/xrpc/com.atproto.repo.listRecords?repo=${HANDLE}&collection=${COLLECTION}&limit=100`
+    const priceCache = new Map()
+    const pendingFetches = new Map()
+    const MAX_CONCURRENT = 5
 
-  async function fetchCollection() {
-    try {
-      let cursor = null
-      let records = []
+    let activeFetches = 0
+    const fetchQueue = []
+    let allCards = []
+    let currentSort = 'newest'
+    let currentSetFilter = 'all'
+    let collapsedSets = new Set()
 
-      do {
-        const url = cursor ? `${API_BASE}&cursor=${cursor}` : API_BASE
-        const res = await fetch(url)
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const data = await res.json()
-        records = records.concat(data.records)
-        cursor = data.cursor
-      } while (cursor)
+    async function fetchCardDetails(cardId) {
+      if (!cardId) return null
 
-      // _index preserves insertion order; higher = more recently added
-      allCards = records.map((r, i) => ({ ...r.value, _index: i }))
-
-      if (!allCards.length) {
-        document.getElementById('main').innerHTML = `<div class="state"><span>no cards in collection yet</span></div>`
-        document.getElementById('count-badge').textContent = 'empty collection'
-        return
+      // already cached
+      if (priceCache.has(cardId)) {
+        return priceCache.get(cardId)
       }
 
-      populateSetFilter()
-      render()
+      // already being fetched
+      if (pendingFetches.has(cardId)) {
+        return pendingFetches.get(cardId)
+      }
 
-    } catch (err) {
-      document.getElementById('main').innerHTML = `
+      const promise = new Promise((resolve) => {
+        fetchQueue.push({ cardId, resolve })
+        processQueue()
+      })
+
+      pendingFetches.set(cardId, promise)
+      return promise
+    }
+
+    async function processQueue() {
+      if (activeFetches >= MAX_CONCURRENT || fetchQueue.length === 0) return
+
+      const { cardId, resolve } = fetchQueue.shift()
+      activeFetches++
+
+      try {
+        const res = await fetch(`https://api.tcgdex.net/v2/en/cards/${cardId}`)
+        const data = await res.json()
+
+        priceCache.set(cardId, data)
+        resolve(data)
+
+      } catch (err) {
+        resolve(null)
+      } finally {
+        pendingFetches.delete(cardId)
+        activeFetches--
+        processQueue()
+      }
+    }
+
+    async function fetchCollection() {
+      try {
+        let cursor = null
+        let records = []
+
+        do {
+          const url = cursor ? `${API_BASE}&cursor=${cursor}` : API_BASE
+          const res = await fetch(url)
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          const data = await res.json()
+          records = records.concat(data.records)
+          cursor = data.cursor
+        } while (cursor)
+
+        allCards = records.map((r, i) => ({ ...r.value, _index: i }))
+
+        if (!allCards.length) {
+          document.getElementById('main').innerHTML = `<div class="state"><span>no cards in collection yet</span></div>`
+          document.getElementById('count-badge').textContent = 'empty collection'
+          return
+        }
+
+        populateSetFilter()
+        render()
+        hydratePrices(allCards)
+
+      } catch (err) {
+        document.getElementById('main').innerHTML = `
         <div class="state" style="color:#f05080">
           <span>failed to load collection</span>
           <span style="color:var(--muted);font-size:0.65rem">${err.message}</span>
         </div>`
+      }
     }
-  }
 
-  function populateSetFilter() {
-    const sets = [...new Set(allCards.map(c => c.set).filter(Boolean))].sort()
-    const sel = document.getElementById('set-filter')
-    sets.forEach(s => {
-      const opt = document.createElement('option')
-      opt.value = s
-      opt.textContent = s
-      sel.appendChild(opt)
-    })
-  }
-
-  function getSorted(cards) {
-    if (currentSort === 'az') {
-      return [...cards].sort((a, b) => a.name.localeCompare(b.name))
-    }
-    return [...cards].sort((a, b) => b._index - a._index)
-  }
-
-  function groupBySet(cards) {
-    const map = new Map()
-    cards.forEach(card => {
-      const key = card.set || 'Unknown Set'
-      if (!map.has(key)) map.set(key, [])
-      map.get(key).push(card)
-    })
-
-    let entries = [...map.entries()]
-
-    if (currentSort === 'az') {
-      entries.sort(([a], [b]) => a.localeCompare(b))
-    } else {
-      // sort set groups so the set with the most recently added card comes first
-      entries.sort(([, a], [, b]) => {
-        return Math.max(...b.map(c => c._index)) - Math.max(...a.map(c => c._index))
+    function populateSetFilter() {
+      const sets = [...new Set(allCards.map(c => c.set).filter(Boolean))].sort()
+      const sel = document.getElementById('set-filter')
+      sets.forEach(s => {
+        const opt = document.createElement('option')
+        opt.value = s
+        opt.textContent = s
+        sel.appendChild(opt)
       })
     }
 
-    return entries
-  }
+    function sortByLocalId(a, b) {
+      const na = parseInt(a.localId, 10)
+      const nb = parseInt(b.localId, 10)
 
-  function render() {
-    const filtered = currentSetFilter === 'all'
-      ? allCards
-      : allCards.filter(c => c.set === currentSetFilter)
-
-    const badge = document.getElementById('count-badge')
-    badge.innerHTML = `<strong>${filtered.length}</strong> card${filtered.length !== 1 ? 's' : ''}${currentSetFilter !== 'all' ? ` · <strong>${currentSetFilter}</strong>` : ''}`
-
-    if (!filtered.length) {
-      document.getElementById('main').innerHTML = `<div class="state"><span>no cards match current filter</span></div>`
-      return
+      if (!isNaN(na) && !isNaN(nb)) return na - nb
+      return (a.localId || '').localeCompare(b.localId || '')
     }
 
-    const sorted = getSorted(filtered)
-    const groups = groupBySet(sorted)
-    const main = document.getElementById('main')
-    main.innerHTML = ''
+    function getSorted(cards) {
+      if (currentSort === 'az') {
+        return [...cards].sort((a, b) => a.name.localeCompare(b.name))
+      }
 
-    groups.forEach(([setName, cards], gi) => {
-      const isCollapsed = collapsedSets.has(setName)
+      if (currentSort === 'set') {
+        return [...cards].sort(sortByLocalId)
+      }
 
-      const group = document.createElement('div')
-      group.className = 'set-group'
-      group.style.animationDelay = `${gi * 50}ms`
-      group.dataset.setName = setName
+      return [...cards].sort((a, b) => b._index - a._index)
+    }
 
-      // rough max-height for animation: card ~240px tall + gap, N columns ~5
-      const approxHeight = Math.ceil(cards.length / 5) * 280 + 80
+    function groupBySet(cards) {
+      const map = new Map()
+      cards.forEach(card => {
+        const key = card.set || 'Unknown Set'
+        if (!map.has(key)) map.set(key, [])
+        map.get(key).push(card)
+      })
 
-      group.innerHTML = `
+      let entries = [...map.entries()]
+
+      if (currentSort === 'az') {
+        entries.sort(([a], [b]) => a.localeCompare(b))
+      } else {
+        entries.sort(([, a], [, b]) => {
+          return Math.max(...b.map(c => c._index)) - Math.max(...a.map(c => c._index))
+        })
+      }
+
+      return entries
+    }
+
+    function formatCollectorNumber(card) {
+      if (!card.localId || !card.set?.cardCount?.official) return ''
+
+      const num = card.localId.padStart(3, '0')
+      const total = card.set.cardCount.official
+      return `${num}/${total}`
+    }
+
+    function extractPrice(card) {
+      const prices = card?.tcgplayer?.prices
+      if (!prices) return null
+
+      return prices.holofoil?.market
+        || prices.normal?.market
+        || prices.reverseHolofoil?.market
+        || null
+    }
+
+    function formatPrice(card) {
+      const price = extractPrice(card)
+      return price ? `$${price.toFixed(2)}` : ''
+    }
+
+    function render() {
+      const filtered = currentSetFilter === 'all'
+        ? allCards
+        : allCards.filter(c => c.set === currentSetFilter)
+
+      const badge = document.getElementById('count-badge')
+      badge.innerHTML = `<strong>${filtered.length}</strong> card${filtered.length !== 1 ? 's' : ''}${currentSetFilter !== 'all' ? ` · <strong>${currentSetFilter}</strong>` : ''}`
+
+      if (!filtered.length) {
+        document.getElementById('main').innerHTML = `<div class="state"><span>no cards match current filter</span></div>`
+        return
+      }
+
+      const sorted = getSorted(filtered)
+      const groups = groupBySet(sorted)
+      const main = document.getElementById('main')
+      main.innerHTML = ''
+
+      groups.forEach(([setName, cards], gi) => {
+        const isCollapsed = collapsedSets.has(setName)
+
+        const group = document.createElement('div')
+        group.className = 'set-group'
+        group.style.animationDelay = `${gi * 50}ms`
+
+        const approxHeight = Math.ceil(cards.length / 5) * 280 + 80
+
+        group.innerHTML = `
         <div class="set-header">
           <span class="set-name">${setName}</span>
           <span class="set-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</span>
@@ -533,65 +753,100 @@
         </div>
       `
 
-      group.querySelector('.set-header').addEventListener('click', () => {
-        const cardsEl = group.querySelector('.set-cards')
-        const toggle = group.querySelector('.set-toggle')
-        if (collapsedSets.has(setName)) {
-          collapsedSets.delete(setName)
-          cardsEl.classList.remove('collapsed')
-          cardsEl.style.maxHeight = approxHeight + 'px'
-          toggle.textContent = '▾ collapse'
-        } else {
-          collapsedSets.add(setName)
-          cardsEl.classList.add('collapsed')
-          cardsEl.style.maxHeight = '0'
-          toggle.textContent = '▸ expand'
+        group.querySelector('.set-header').addEventListener('click', () => {
+          const cardsEl = group.querySelector('.set-cards')
+          const toggle = group.querySelector('.set-toggle')
+          if (collapsedSets.has(setName)) {
+            collapsedSets.delete(setName)
+            cardsEl.classList.remove('collapsed')
+            cardsEl.style.maxHeight = approxHeight + 'px'
+            toggle.textContent = '▾ collapse'
+          } else {
+            collapsedSets.add(setName)
+            cardsEl.classList.add('collapsed')
+            cardsEl.style.maxHeight = '0'
+            toggle.textContent = '▸ expand'
+          }
+        })
+
+        main.appendChild(group)
+      })
+    }
+
+    function hydratePrices(cards) {
+      cards.forEach(async (card) => {
+        const cardId = card.id || card._index
+        const el = document.getElementById(`price-${cardId}`)
+        if (!el) return
+
+        // already has inline price
+        let price = extractPrice(card)
+        if (price) {
+          const collector = formatCollectorNumber(card)
+          el.textContent = collector ? `${collector} · $${price.toFixed(2)}` : `$${price.toFixed(2)}`
+          return
+        }
+
+        // fetch enriched data
+        const full = await fetchCardDetails(card.id)
+        if (!full) return
+
+        price = extractPrice(full)
+        const collector = formatCollectorNumber(card)
+
+        if (price) {
+          el.textContent = collector ? `${collector} · $${price.toFixed(2)}` : `$${price.toFixed(2)}`
+        } else if (collector) {
+          el.textContent = collector
         }
       })
+    }
 
-      main.appendChild(group)
-    })
-  }
+    function cardHTML(card, i) {
+      const status = card.status || 'owned'
+      const condition = card.condition || ''
+      const delay = Math.min(i * 25, 500)
+      const hasImg = !!card.image
 
-  function cardHTML(card, i) {
-    const status = card.status || 'owned'
-    const condition = card.condition || ''
-    const delay = Math.min(i * 25, 500)
-    const hasImg = !!card.image
+      const collector = formatCollectorNumber(card)
 
-    return `
-      <div class="card" style="animation-delay:${delay}ms">
-        <div class="card-img-wrap">
-          ${hasImg ? `<img src="${card.image}" alt="${card.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.no-image').style.display='flex'">` : ''}
-          <div class="no-image" style="display:${hasImg ? 'none' : 'flex'}">no image</div>
-          <div class="status-dot ${status}"></div>
-        </div>
-        <div class="card-meta">
-          <div class="card-name" title="${card.name}">${card.name}</div>
-          <div class="card-tags">
-            <span class="tag ${status}">${status}</span>
-            ${condition ? `<span class="tag">${condition}</span>` : ''}
-          </div>
+      return `
+    <div class="card" style="animation-delay:${delay}ms">
+      <div class="card-img-wrap">
+        ${hasImg ? `<img src="${card.image}" alt="${card.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.no-image').style.display='flex'">` : ''}
+        <div class="no-image" style="display:${hasImg ? 'none' : 'flex'}">no image</div>
+        <div class="status-dot ${status}"></div>
+        <div class="card-price-hover" id="price-${card.id || card._index}"></div>
+      </div>
+      <div class="card-meta">
+        <div class="card-name" title="${card.name}">${card.name}</div>
+        <div class="card-tags">
+          <span class="tag ${status}">${status}</span>
+          ${condition ? `<span class="tag">${condition}</span>` : ''}
         </div>
       </div>
-    `
-  }
+    </div>
+  `
+    }
 
-  document.getElementById('set-filter').addEventListener('change', e => {
-    currentSetFilter = e.target.value
-    render()
-  })
-
-  document.querySelectorAll('.pill[data-sort]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.pill[data-sort]').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      currentSort = btn.dataset.sort
+    document.getElementById('set-filter').addEventListener('change', e => {
+      currentSetFilter = e.target.value
       render()
     })
-  })
 
-  fetchCollection()
-</script>
+    document.querySelectorAll('.pill[data-sort]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pill[data-sort]').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        currentSort = btn.dataset.sort
+        const filtered = currentSetFilter === 'all' ? allCards : allCards.filter(c => c.set === currentSetFilter)
+        render()
+        hydratePrices(filtered)
+      })
+    })
+
+    fetchCollection()
+  </script>
 </body>
+
 </html>
