@@ -1,1 +1,235 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>about — nug.monster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #1e1e2e;
+      --accent: #c8f050;
+      --accent2: #50f0c8;
+      --text: #e8e8f0;
+      --muted: #5a5a7a;
+      --card-glow: rgba(200, 240, 80, 0.08);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 3rem 2rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 120px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .site-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+    }
+
+    /* ── Nav breadcrumb (matches .controls) ── */
+    .breadcrumb {
+      padding: 1.25rem 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 10, 15, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .breadcrumb-label {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .breadcrumb-path {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .breadcrumb-path strong {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    .breadcrumb-path a {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .breadcrumb-path a:hover {
+      color: var(--accent2);
+    }
+
+    /* ── Main content ── */
+    main {
+      padding: 3rem 2rem 4rem;
+      flex: 1;
+      max-width: 800px;
+    }
+
+    main h2 {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    main p {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    main a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    main a:hover {
+      color: var(--accent2);
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--accent2);
+    }
+
+    @media (max-width: 540px) {
+      header {
+        padding: 2.25rem 1.25rem 1.5rem;
+      }
+
+      .breadcrumb {
+        padding: 1rem 1.25rem;
+      }
+
+      main {
+        padding: 2rem 1.25rem 3rem;
+      }
+
+      footer {
+        padding: 1.5rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <span class="site-label">nug.monster</span>
+    <h1>about</h1>
+  </header>
+
+  <nav class="breadcrumb">
+    <span class="breadcrumb-label">path</span>
+    <span class="breadcrumb-path"><a href="../index.html">/</a> <strong>about</strong></span>
+  </nav>
+
+  <main>
+    <p>Welcome to the about page. This is where you can learn more about the person behind nug.monster and what drives
+      this collection.</p>
+
+    <h2>the collector</h2>
+    <p>Add your personal information here. Tell visitors who you are, what you're passionate about, and what makes your
+      collection special.</p>
+
+    <h2>the collection</h2>
+    <p>Explain what you collect, why it matters to you, and what drives your passion for these cards. Share your
+      collecting journey and any notable acquisitions.</p>
+
+    <h2>why this exists</h2>
+    <p>Describe your motivations for creating this website and sharing your collection with the world. What do you hope
+      visitors take away from visiting nug.monster?</p>
+  </main>
+
+  <footer>
+    <span>nug.monster — est. 2025</span>
+    <span><a href="../index.html">home →</a></span>
+  </footer>
+</body>
+
+</html>
