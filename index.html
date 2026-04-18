@@ -177,9 +177,17 @@
       animation: fadeUp 0.4s ease forwards;
     }
 
-    .tile:nth-child(1) { animation-delay: 0.05s; }
-    .tile:nth-child(2) { animation-delay: 0.15s; }
-    .tile:nth-child(3) { animation-delay: 0.25s; }
+    .tile:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .tile:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .tile:nth-child(3) {
+      animation-delay: 0.25s;
+    }
 
     @keyframes fadeUp {
       to {
@@ -305,12 +313,30 @@
     }
 
     @media (max-width: 540px) {
-      header { padding: 2.25rem 1.25rem 1.5rem; }
-      .breadcrumb { padding: 1rem 1.25rem; }
-      main { padding: 2rem 1.25rem 3rem; }
-      footer { padding: 1.5rem 1.25rem; }
-      .tile-grid { grid-template-columns: 1fr; }
-      .tile { aspect-ratio: auto; min-height: 220px; }
+      header {
+        padding: 2.25rem 1.25rem 1.5rem;
+      }
+
+      .breadcrumb {
+        padding: 1rem 1.25rem;
+      }
+
+      main {
+        padding: 2rem 1.25rem 3rem;
+      }
+
+      footer {
+        padding: 1.5rem 1.25rem;
+      }
+
+      .tile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tile {
+        aspect-ratio: auto;
+        min-height: 220px;
+      }
     }
   </style>
 </head>
@@ -348,7 +374,7 @@
         <span class="tile-arrow">↗</span>
       </a>
 
-      <a class="tile" href="about.html">
+      <a class="tile" href="about/index.html">
         <span class="tile-index">02 / 03</span>
         <span class="tile-status"></span>
         <div class="tile-body">
@@ -361,7 +387,7 @@
         <span class="tile-arrow">↗</span>
       </a>
 
-      <a class="tile" href="contact.html">
+      <a class="tile" href="contact/index.html">
         <span class="tile-index">03 / 03</span>
         <span class="tile-status"></span>
         <div class="tile-body">
