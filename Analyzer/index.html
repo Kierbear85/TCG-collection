@@ -1092,7 +1092,7 @@
       // ── Config ────────────────────────────────────────────
       const API     = 'https://public.api.bsky.app/xrpc';
       const PLC_DIR = 'https://plc.directory';
-      const DAYS    = 90;
+      let   DAYS    = 90;
       const MAX_POSTS = 1500;
 
       // ── DOM refs ──────────────────────────────────────────
@@ -1464,6 +1464,35 @@
           }
         }
       }
+
+      // ── Auto-load scan.json if present ────────────────────
+      (async function tryLoadScan() {
+        try {
+          const r = await fetch('scan.json');
+          if (!r.ok) return;
+          const scan = await r.json();
+          if (!scan.posts?.length) return;
+
+          DAYS = scan.windowDays || 90;
+          const posts        = scan.posts;
+          const didHandleMap = scan.didHandleMap || {};
+
+          renderProfile(scan.profile);
+          renderHeatmap(buildHeatgrid(posts));
+          renderVocab(topWords(posts));
+          renderPostingStats(postingStats(posts));
+          renderEngagement(engagementStats(posts));
+          renderInteractionWeb(replyTargets(posts, didHandleMap));
+
+          const when = scan.scannedAt
+            ? new Date(scan.scannedAt).toLocaleString()
+            : 'unknown';
+          setStatus(`loaded scan.json · ${posts.length} posts · ${DAYS}d window · scanned ${when}`);
+          if (scan.profile?.handle) input.value = '@' + scan.profile.handle;
+        } catch (_) {
+          // scan.json not found — keep mock data, wait for live scan
+        }
+      })();
 
       // ── Seed heatmap with mock data on first load ──────────
       (function seedHeatmap() {
