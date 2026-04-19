@@ -8,14 +8,22 @@ Forensic analysis of any public Bluesky account. Posting patterns, vocabulary fi
 ```bash
 python fetch_posts.py @handle.bsky.social
 # options:
-#   --days 90       look-back window (default: 90)
-#   --max 10000     post cap (default: 10000)
+#   --days 0        look-back window in days, 0 = no limit (default: 0)
+#   --max 0         post cap, 0 = no limit (default: 0)
 #   --out scan.json output file (default: scan.json)
 ```
 
 This writes `scan.json` into the same folder.
 
-**Step 2 — view the analysis**
+**Step 2 — score sentiment (optional)**
+```bash
+pip install vaderSentiment
+python analyze_sentiment.py --in scan.json
+```
+
+Adds a `sentiment` field to each post and a `sentimentSummary` block to the file. Prints the most positive/negative posts to stdout.
+
+**Step 3 — view the analysis**
 
 Serve the folder with any static file server and open `index.html`:
 ```bash
@@ -30,9 +38,10 @@ python -m http.server 8080
 ```json
 {
   "profile":      { ...AppView profile fields... },
-  "posts":        [ { "uri", "createdAt", "text", "replyParentUri", "likeCount", "repostCount" } ],
+  "posts":        [ { "uri", "createdAt", "text", "replyParentUri", "likeCount", "repostCount", "sentiment?" } ],
   "didHandleMap": { "did:plc:...": "handle.bsky.social" },
   "scannedAt":    "2025-01-01T00:00:00+00:00",
-  "windowDays":   90
+  "windowDays":   0,
+  "sentimentSummary?": { "scored", "avgCompound", "positive", "neutral", "negative" }
 }
 ```

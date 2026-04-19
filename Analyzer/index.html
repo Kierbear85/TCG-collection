@@ -10,7 +10,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Unbounded:wght@400;700;900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="styles.css" />
   <style>
     /* ── Analyzer-specific ── */
     main.analyzer {
@@ -320,8 +320,14 @@
       user-select: none;
       transition: color 0.15s;
     }
-    .hm-day:hover { color: var(--accent); }
-    .hm-day.hm-day-active { color: var(--accent); }
+
+    .hm-day:hover {
+      color: var(--accent);
+    }
+
+    .hm-day.hm-day-active {
+      color: var(--accent);
+    }
 
     /* Day-detail bar chart panel */
     .hm-detail {
@@ -332,7 +338,11 @@
       background: rgba(200, 240, 80, 0.02);
       display: none;
     }
-    .hm-detail.active { display: block; }
+
+    .hm-detail.active {
+      display: block;
+    }
+
     .hm-detail-head {
       display: flex;
       justify-content: space-between;
@@ -343,12 +353,17 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
+
     .hm-detail-close {
       color: var(--accent);
       cursor: pointer;
       letter-spacing: 0.05em;
     }
-    .hm-detail-close:hover { opacity: 0.7; }
+
+    .hm-detail-close:hover {
+      opacity: 0.7;
+    }
+
     .hm-detail-foot {
       display: flex;
       justify-content: space-between;
@@ -391,6 +406,42 @@
       width: 12px;
       height: 12px;
       border-radius: 2px;
+    }
+
+    /* Heatmap mode toggle */
+    .hm-mode {
+      display: none;
+      gap: 0;
+      margin-left: auto;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .hm-mode.visible {
+      display: inline-flex;
+    }
+
+    .hm-mode button {
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.7rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .hm-mode button.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .hm-mode button:not(.active):hover {
+      color: var(--text);
     }
 
     /* Sentiment chart */
@@ -798,64 +849,43 @@
           <!-- built by js -->
         </div>
 
-        <div class="hm-legend">
-          <span>less</span>
-          <div class="hm-legend-scale">
+        <div class="hm-legend" id="hm-legend">
+          <span id="hm-legend-lo">less</span>
+          <div class="hm-legend-scale" id="hm-legend-scale">
             <span style="background:#1a1a28"></span>
             <span style="background:#2a3a1a"></span>
             <span style="background:#4a6a20"></span>
             <span style="background:#7aa830"></span>
             <span style="background:#c8f050"></span>
           </div>
-          <span>more · dark cells = silence · click a day label to expand</span>
+          <span id="hm-legend-hi">more · dark cells = silence · click a day label to expand</span>
+          <div class="hm-mode" id="hm-mode">
+            <button type="button" data-mode="count" class="active">count</button>
+            <button type="button" data-mode="sentiment">sentiment</button>
+          </div>
         </div>
 
         <div class="hm-detail" id="hm-detail"></div>
       </section>
 
       <!-- 05 SENTIMENT TIMELINE -->
-      <section class="block span-8">
+      <section class="block span-8" id="block05">
         <div class="block-head">
           <div>
             <div class="block-id">BLOCK 05</div>
-            <div class="block-title">sentiment timeline · 90d</div>
+            <div class="block-title" id="block05-title">sentiment timeline</div>
           </div>
-          <div class="block-sub">mood drift</div>
+          <div class="block-sub">7-day rolling compound · root posts only</div>
         </div>
 
-        <!-- SENTIMENT ANALYSIS SLOT — replace points with real scores -->
-        <svg class="sentiment-chart" viewBox="0 0 800 180" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="sentFill" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stop-color="#c8f050" stop-opacity="0.25" />
-              <stop offset="100%" stop-color="#c8f050" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <!-- zero line -->
+        <svg class="sentiment-chart" id="mood-chart" viewBox="0 0 800 180" preserveAspectRatio="none">
           <line x1="0" y1="90" x2="800" y2="90" stroke="#2a2a3e" stroke-dasharray="2,4" />
-          <!-- positive band label -->
           <text x="4" y="14" fill="#5a5a7a" font-family="DM Mono" font-size="8" letter-spacing="1">+ POSITIVE</text>
           <text x="4" y="175" fill="#5a5a7a" font-family="DM Mono" font-size="8" letter-spacing="1">− NEGATIVE</text>
-
-          <!-- fill -->
-          <path
-            d="M0,80 L50,60 L100,70 L150,40 L200,55 L250,85 L300,100 L350,140 L400,155 L450,120 L500,90 L550,70 L600,95 L650,110 L700,75 L750,50 L800,65 L800,180 L0,180 Z"
-            fill="url(#sentFill)" />
-          <!-- line -->
-          <path
-            d="M0,80 L50,60 L100,70 L150,40 L200,55 L250,85 L300,100 L350,140 L400,155 L450,120 L500,90 L550,70 L600,95 L650,110 L700,75 L750,50 L800,65"
-            fill="none" stroke="#c8f050" stroke-width="1.5" />
-
-          <!-- annotation marker -->
-          <circle cx="400" cy="155" r="4" fill="#f05078" />
-          <line x1="400" y1="155" x2="400" y2="30" stroke="#f05078" stroke-dasharray="2,2" stroke-width="0.5" />
-          <text x="405" y="28" fill="#f05078" font-family="DM Mono" font-size="8" letter-spacing="0.5">↓ EVENT · mar
-            14</text>
         </svg>
 
-        <div class="sentiment-anno">
-          <strong>anomaly detected · march 14 →</strong> sentiment dropped 3.2σ below baseline. 47 posts in 6 hours, 89%
-          containing em-dashes. recovery achieved over 12 days.
+        <div class="sentiment-anno" id="mood-anno" style="display:none;">
+          <strong id="mood-anno-hd">—</strong> <span id="mood-anno-body">—</span>
         </div>
       </section>
 
@@ -1011,42 +1041,31 @@
       </section>
 
       <!-- 10 SENTIMENT BREAKDOWN -->
-      <section class="block span-6">
+      <section class="block span-6" id="block10">
         <div class="block-head">
           <div>
             <div class="block-id">BLOCK 10</div>
             <div class="block-title">sentiment breakdown</div>
           </div>
-          <div class="block-sub">emotional composition</div>
+          <div class="block-sub" id="block10-sub">no sentiment data · run analyze_sentiment.py</div>
         </div>
 
-        <!-- SENTIMENT ANALYSIS SLOT · stacked bar -->
-        <div style="display: flex; height: 24px; border-radius: 3px; overflow: hidden; margin-bottom: 1rem;">
-          <div
-            style="flex: 38; background: var(--accent); display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700; letter-spacing: 0.05em;">
-            38% POS</div>
-          <div
-            style="flex: 27; background: var(--accent2); display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700;">
-            27% NEU</div>
-          <div
-            style="flex: 24; background: #f05078; display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700;">
-            24% NEG</div>
-          <div
-            style="flex: 11; background: #8050f0; display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700;">
-            11% ???</div>
+        <div class="sent-bar" id="sent-bar"
+          style="display:flex;height:24px;border-radius:3px;overflow:hidden;margin-bottom:1rem;background:#1a1a28;">
         </div>
 
-        <div class="meta-metrics" style="grid-template-columns: 1fr; margin-top: 0; padding-top: 0; border-top: 0;">
-          <div class="meta-metric"><span class="meta-metric-label">dominant emotion</span><span class="meta-metric-val"
-              style="color:var(--accent)">defiant joy</span></div>
-          <div class="meta-metric"><span class="meta-metric-label">subtext detected</span><span class="meta-metric-val"
-              style="color:#f05078">yearning</span></div>
-          <div class="meta-metric"><span class="meta-metric-label">sincerity score</span><span
-              class="meta-metric-val">12 / 100</span></div>
-          <div class="meta-metric"><span class="meta-metric-label">bit-to-truth ratio</span><span
-              class="meta-metric-val">8.4 : 1</span></div>
-          <div class="meta-metric"><span class="meta-metric-label">cope detected</span><span class="meta-metric-val"
-              style="color:#f05078">affirmative</span></div>
+        <div class="meta-metrics" id="sent-metrics"
+          style="grid-template-columns:1fr;margin-top:0;padding-top:0;border-top:0;">
+          <div class="meta-metric"><span class="meta-metric-label">avg compound</span><span class="meta-metric-val"
+              id="sent-avg">—</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">engagement delta · neg vs pos</span><span
+              class="meta-metric-val" id="sent-engage">—</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">late-night mood gap (0–3 vs 10–17)</span><span
+              class="meta-metric-val" id="sent-latenight">—</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">most negative hour</span><span
+              class="meta-metric-val" id="sent-worsthour">—</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">scored · skipped replies</span><span
+              class="meta-metric-val" id="sent-counts">—</span></div>
         </div>
       </section>
 
@@ -1090,14 +1109,14 @@
       'use strict';
 
       // ── Config ────────────────────────────────────────────
-      const API     = 'https://public.api.bsky.app/xrpc';
+      const API = 'https://public.api.bsky.app/xrpc';
       const PLC_DIR = 'https://plc.directory';
-      let   DAYS    = 90;
+      let DAYS = 90;
       const MAX_POSTS = 1500;
 
       // ── DOM refs ──────────────────────────────────────────
-      const form       = document.getElementById('scan-form');
-      const input      = form.querySelector('input');
+      const form = document.getElementById('scan-form');
+      const input = form.querySelector('input');
       const statusText = document.querySelector('.scan-status span:last-child');
 
       function setStatus(msg) { statusText.textContent = msg; }
@@ -1109,9 +1128,9 @@
         if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
         return String(n);
       }
-      function fmtDate(iso)      { return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); }
+      function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); }
       function fmtShortDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
-      function padHour(h)        { return h.toString().padStart(2, '0') + ':00'; }
+      function padHour(h) { return h.toString().padStart(2, '0') + ':00'; }
 
       // ── Step 1 · AppView profile (DID + social counts) ────
       async function getProfile(handle) {
@@ -1137,13 +1156,13 @@
       // value has: $type, text, createdAt, reply?, embed?, langs?
       async function listPdsPosts(pds, did) {
         const records = [];
-        const cutoff  = Date.now() - DAYS * 86400000;
+        const cutoff = Date.now() - DAYS * 86400000;
         let cursor;
         while (records.length < MAX_POSTS) {
           const url = new URL(`${pds}/xrpc/com.atproto.repo.listRecords`);
-          url.searchParams.set('repo',       did);
+          url.searchParams.set('repo', did);
           url.searchParams.set('collection', 'app.bsky.feed.post');
-          url.searchParams.set('limit',      '100');
+          url.searchParams.set('limit', '100');
           if (cursor) url.searchParams.set('cursor', cursor);
           const r = await fetch(url);
           if (!r.ok) break;
@@ -1200,12 +1219,12 @@
       // ── Normalise PDS records into flat post objects ───────
       function normalisePosts(pdsRecords, engagementMap) {
         return pdsRecords.map(rec => ({
-          uri:            rec.uri,
-          createdAt:      rec.value?.createdAt || '',
-          text:           rec.value?.text || '',
+          uri: rec.uri,
+          createdAt: rec.value?.createdAt || '',
+          text: rec.value?.text || '',
           replyParentUri: rec.value?.reply?.parent?.uri || null,
-          likeCount:      engagementMap.get(rec.uri)?.likeCount   ?? 0,
-          repostCount:    engagementMap.get(rec.uri)?.repostCount ?? 0,
+          likeCount: engagementMap.get(rec.uri)?.likeCount ?? 0,
+          repostCount: engagementMap.get(rec.uri)?.repostCount ?? 0,
         }));
       }
 
@@ -1218,6 +1237,133 @@
           grid[(d.getDay() + 6) % 7][d.getHours()]++;
         }
         return grid;
+      }
+
+      // Two parallel 7×24 grids: summed compound, and count of scored posts.
+      // Cells with fewer than MIN_SAMPLE scored posts are treated as "unknown"
+      // to keep a single angry 3am post from painting the whole cell red.
+      function buildSentimentGrid(posts) {
+        const sum = Array.from({ length: 7 }, () => new Array(24).fill(0));
+        const cnt = Array.from({ length: 7 }, () => new Array(24).fill(0));
+        for (const p of posts) {
+          if (!p.sentiment) continue;
+          const d = new Date(p.createdAt);
+          if (isNaN(d)) continue;
+          const day = (d.getDay() + 6) % 7;
+          const hr = d.getHours();
+          sum[day][hr] += p.sentiment.compound;
+          cnt[day][hr]++;
+        }
+        return { sum, cnt };
+      }
+
+      function hasSentiment(posts) {
+        return posts.some(p => p.sentiment);
+      }
+
+      // -1 → pink (#f05078), 0 → dark grey, +1 → accent yellow-green.
+      // Lightness scales with |compound| so strong cells pop; weak cells fade.
+      function sentColor(avg) {
+        const mag = Math.min(1, Math.abs(avg));
+        const hue = avg < 0 ? 340 : 75;
+        const sat = Math.round(30 + mag * 60);
+        const lite = Math.round(14 + mag * 42);
+        return `hsl(${hue}, ${sat}%, ${lite}%)`;
+      }
+
+      function sentimentStats(posts) {
+        const scored = posts.filter(p => p.sentiment);
+        if (!scored.length) return null;
+
+        const avg = arr =>
+          arr.length ? arr.reduce((s, p) => s + p.sentiment.compound, 0) / arr.length : 0;
+        const avgLikes = arr =>
+          arr.length ? arr.reduce((s, p) => s + (p.likeCount || 0), 0) / arr.length : 0;
+
+        const late = scored.filter(p => {
+          const h = new Date(p.createdAt).getHours();
+          return h < 4;
+        });
+        const day = scored.filter(p => {
+          const h = new Date(p.createdAt).getHours();
+          return h >= 10 && h < 18;
+        });
+
+        const pos = scored.filter(p => p.sentiment.label === 'positive');
+        const neu = scored.filter(p => p.sentiment.label === 'neutral');
+        const neg = scored.filter(p => p.sentiment.label === 'negative');
+
+        // Engagement delta uses only posts with a real engagement signal —
+        // likeCount comes from AppView's getAuthorFeed which is capped at the
+        // latest 100. Posts older than that window all show 0 likes and would
+        // drag the averages to noise.
+        const hasLikes = p => (p.likeCount || 0) > 0 || (p.repostCount || 0) > 0;
+        const posLivePosts = pos.filter(hasLikes);
+        const negLivePosts = neg.filter(hasLikes);
+        const posLikeAvg = avgLikes(posLivePosts);
+        const negLikeAvg = avgLikes(negLivePosts);
+        const delta = posLikeAvg > 0
+          ? Math.round((negLikeAvg - posLikeAvg) / posLikeAvg * 100)
+          : null;
+
+        // Most-negative hour (0..23) using only hours with ≥5 scored posts
+        const hourSum = new Array(24).fill(0);
+        const hourCnt = new Array(24).fill(0);
+        for (const p of scored) {
+          const h = new Date(p.createdAt).getHours();
+          hourSum[h] += p.sentiment.compound;
+          hourCnt[h]++;
+        }
+        let worstHour = -1, worstAvg = Infinity;
+        for (let h = 0; h < 24; h++) {
+          if (hourCnt[h] < 5) continue;
+          const a = hourSum[h] / hourCnt[h];
+          if (a < worstAvg) { worstAvg = a; worstHour = h; }
+        }
+
+        return {
+          scored: scored.length,
+          skippedReplies: posts.filter(p => p.replyParentUri).length,
+          avg: avg(scored),
+          posCount: pos.length,
+          neuCount: neu.length,
+          negCount: neg.length,
+          lateAvg: avg(late),
+          lateCount: late.length,
+          dayAvg: avg(day),
+          dayCount: day.length,
+          posLikeAvg,
+          negLikeAvg,
+          engagementDelta: delta,
+          engagementSample: posLivePosts.length + negLivePosts.length,
+          worstHour,
+          worstAvg: isFinite(worstAvg) ? worstAvg : null,
+        };
+      }
+
+      // 7-day rolling average of daily compound, weighted by per-day post count.
+      // maxDays caps the *displayed* window to the most recent N days so a
+      // single malformed-date outlier post (we have one from 1929) can't
+      // stretch the x-axis and squish the real trend.
+      function moodOverTime(posts, { windowDays = 7, maxDays = 365 } = {}) {
+        const byDay = {};
+        for (const p of posts) {
+          if (!p.sentiment) continue;
+          const d = (p.createdAt || '').slice(0, 10);
+          if (!d) continue;
+          if (!byDay[d]) byDay[d] = { sum: 0, n: 0 };
+          byDay[d].sum += p.sentiment.compound;
+          byDay[d].n++;
+        }
+        const days = Object.keys(byDay).sort();
+        if (!days.length) return [];
+        const rolling = days.map((day, i) => {
+          const start = Math.max(0, i - windowDays + 1);
+          let s = 0, n = 0;
+          for (let j = start; j <= i; j++) { s += byDay[days[j]].sum; n += byDay[days[j]].n; }
+          return { day, avg: n ? s / n : 0, n };
+        });
+        return maxDays ? rolling.slice(-maxDays) : rolling;
       }
 
       const STOP = new Set(
@@ -1237,7 +1383,7 @@
       function postingStats(posts) {
         if (!posts.length) return { perDay: 0, peakHour: 0, lateNightPct: 0, confessionHour: 3, sleepWindow: '—', streak: 0 };
         const times = posts.map(p => new Date(p.createdAt)).filter(d => !isNaN(d.getTime()));
-        const span  = Math.max(1, (Math.max(...times) - Math.min(...times)) / 86400000);
+        const span = Math.max(1, (Math.max(...times) - Math.min(...times)) / 86400000);
         const perDay = (posts.length / span).toFixed(1);
 
         // Hour distribution
@@ -1286,7 +1432,7 @@
         let total = 0;
         for (const p of posts) {
           if (!p.replyParentUri) continue;
-          const did    = didFromUri(p.replyParentUri);
+          const did = didFromUri(p.replyParentUri);
           if (!did) continue;
           const handle = didHandleMap[did] || did.slice(8, 22) + '…';
           freq[handle] = (freq[handle] || 0) + 1;
@@ -1308,7 +1454,7 @@
           avatarEl.textContent = (p.displayName || p.handle)[0].toUpperCase();
         }
         document.querySelector('#block01 .profile-info h3').textContent = p.displayName || p.handle;
-        document.querySelector('#block01 .profile-handle').textContent  = `@${p.handle} · joined ${fmtDate(p.createdAt)}`;
+        document.querySelector('#block01 .profile-handle').textContent = `@${p.handle} · joined ${fmtDate(p.createdAt)}`;
         const nums = document.querySelectorAll('#block01 .stat-num');
         nums[0].textContent = fmt(p.followersCount);
         nums[1].textContent = fmt(p.followsCount);
@@ -1344,23 +1490,23 @@
           el.classList.toggle('hm-day-active', i === dayIndex)
         );
 
-        const counts  = grid[dayIndex];
-        const total   = counts.reduce((a, b) => a + b, 0);
-        const maxVal  = Math.max(...counts, 1);
-        const peakH   = counts.indexOf(Math.max(...counts));
+        const counts = grid[dayIndex];
+        const total = counts.reduce((a, b) => a + b, 0);
+        const maxVal = Math.max(...counts, 1);
+        const peakH = counts.indexOf(Math.max(...counts));
 
         // SVG bar chart: 24 bars across full width
         const W = 720, H = 80, barW = W / 24, pad = 1.5;
         const bars = counts.map((n, h) => {
-          const bh    = Math.max(n > 0 ? 3 : 0, Math.round(n / maxVal * (H - 14)));
-          const x     = h * barW + pad;
-          const y     = H - bh - 12;
+          const bh = Math.max(n > 0 ? 3 : 0, Math.round(n / maxVal * (H - 14)));
+          const x = h * barW + pad;
+          const y = H - bh - 12;
           const alpha = n === 0 ? 0 : 0.2 + 0.8 * (n / maxVal);
-          const fill  = n === 0 ? '#1e1e2e' : `rgba(200,240,80,${alpha.toFixed(2)})`;
+          const fill = n === 0 ? '#1e1e2e' : `rgba(200,240,80,${alpha.toFixed(2)})`;
           return `<g>
             <rect x="${x.toFixed(1)}" y="${y}" width="${(barW - pad * 2).toFixed(1)}" height="${bh}" fill="${fill}" rx="1"/>
-            <text x="${(x + (barW - pad * 2) / 2).toFixed(1)}" y="${H - 1}" fill="#4a4a6a" font-family="DM Mono" font-size="6" text-anchor="middle">${h.toString().padStart(2,'0')}</text>
-            <title>${h.toString().padStart(2,'0')}:00 · ${n} post${n !== 1 ? 's' : ''}</title>
+            <text x="${(x + (barW - pad * 2) / 2).toFixed(1)}" y="${H - 1}" fill="#4a4a6a" font-family="DM Mono" font-size="6" text-anchor="middle">${h.toString().padStart(2, '0')}</text>
+            <title>${h.toString().padStart(2, '0')}:00 · ${n} post${n !== 1 ? 's' : ''}</title>
           </g>`;
         }).join('');
 
@@ -1371,7 +1517,7 @@
           </div>
           <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:80px;display:block;">${bars}</svg>
           <div class="hm-detail-foot">
-            <span>peak · ${peakH.toString().padStart(2,'0')}:00 · ${counts[peakH]} posts</span>
+            <span>peak · ${peakH.toString().padStart(2, '0')}:00 · ${counts[peakH]} posts</span>
             <span>total · ${total} posts this day-of-week across ${DAYS}d</span>
           </div>`;
 
@@ -1384,17 +1530,34 @@
         detailEl.classList.add('active');
       }
 
-      function renderHeatmap(grid) {
-        const hm     = document.getElementById('heatmap');
+      // Shared state so the mode toggle can re-render from the same data.
+      const MIN_SENTIMENT_SAMPLE = 3;
+      const _hmState = { countGrid: null, sentGrid: null, mode: 'count' };
+
+      function setHeatmapData(countGrid, sentGrid) {
+        _hmState.countGrid = countGrid;
+        _hmState.sentGrid = sentGrid;
+        if (!sentGrid && _hmState.mode === 'sentiment') _hmState.mode = 'count';
+        const toggle = document.getElementById('hm-mode');
+        if (toggle) toggle.classList.toggle('visible', Boolean(sentGrid));
+        renderHeatmap();
+      }
+
+      function renderHeatmap() {
+        const { countGrid, sentGrid, mode } = _hmState;
+        if (!countGrid) return;
+
+        const hm = document.getElementById('heatmap');
         hm.innerHTML = '';
-        // Close any open detail panel when the heatmap is rebuilt (new scan)
         _activeDetailDay = null;
         const detail = document.getElementById('hm-detail');
         if (detail) { detail.classList.remove('active'); detail.innerHTML = ''; }
 
-        const days   = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-        const colors = ['#1a1a28', '#2a3a1a', '#4a6a20', '#7aa830', '#c8f050'];
-        const maxVal = Math.max(...grid.flat(), 1);
+        const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+        const countTiers = ['#1a1a28', '#2a3a1a', '#4a6a20', '#7aa830', '#c8f050'];
+        const maxVal = Math.max(...countGrid.flat(), 1);
+        const useSent = mode === 'sentiment' && sentGrid;
+
         hm.appendChild(document.createElement('div'));
         for (let h = 0; h < 24; h++) {
           const el = document.createElement('div');
@@ -1407,19 +1570,74 @@
           label.className = 'hm-day';
           label.textContent = days[d];
           label.title = `click to expand ${days[d]}`;
-          label.addEventListener('click', () => renderDayDetail(d, days[d], grid));
+          // Day detail always keys off the count grid — sentiment in the
+          // drill-down would overload a panel that's meant for cadence.
+          label.addEventListener('click', () => renderDayDetail(d, days[d], countGrid));
           hm.appendChild(label);
           for (let h = 0; h < 24; h++) {
             const cell = document.createElement('div');
             cell.className = 'hm-cell';
-            const val  = grid[d][h];
-            const tier = val === 0 ? 0 : Math.max(1, Math.min(Math.ceil(val / maxVal * (colors.length - 1)), colors.length - 1));
-            cell.style.background = colors[tier];
-            cell.title = `${days[d]} ${h}:00 · ${val} posts`;
+            const count = countGrid[d][h];
+            if (useSent) {
+              const n = sentGrid.cnt[d][h];
+              if (n < MIN_SENTIMENT_SAMPLE) {
+                cell.style.background = '#1a1a28';
+                cell.title = `${days[d]} ${h}:00 · ${n} scored post${n !== 1 ? 's' : ''} · below sample floor`;
+              } else {
+                const avg = sentGrid.sum[d][h] / n;
+                cell.style.background = sentColor(avg);
+                cell.title = `${days[d]} ${h}:00 · avg compound ${avg.toFixed(2)} · ${n} scored`;
+              }
+            } else {
+              const tier = count === 0
+                ? 0
+                : Math.max(1, Math.min(Math.ceil(count / maxVal * (countTiers.length - 1)), countTiers.length - 1));
+              cell.style.background = countTiers[tier];
+              cell.title = `${days[d]} ${h}:00 · ${count} posts`;
+            }
             hm.appendChild(cell);
           }
         }
+
+        // Legend hint swap
+        const lo = document.getElementById('hm-legend-lo');
+        const hi = document.getElementById('hm-legend-hi');
+        const scale = document.getElementById('hm-legend-scale');
+        if (useSent) {
+          if (lo) lo.textContent = 'negative';
+          if (hi) hi.textContent = `positive · grey = <${MIN_SENTIMENT_SAMPLE} scored posts in cell`;
+          if (scale) {
+            scale.innerHTML =
+              `<span style="background:${sentColor(-0.8)}"></span>` +
+              `<span style="background:${sentColor(-0.3)}"></span>` +
+              `<span style="background:#2a2a40"></span>` +
+              `<span style="background:${sentColor(0.3)}"></span>` +
+              `<span style="background:${sentColor(0.8)}"></span>`;
+          }
+        } else {
+          if (lo) lo.textContent = 'less';
+          if (hi) hi.textContent = 'more · dark cells = silence · click a day label to expand';
+          if (scale) {
+            scale.innerHTML = countTiers.map(c => `<span style="background:${c}"></span>`).join('');
+          }
+        }
+
+        // Toggle button active state
+        document.querySelectorAll('#hm-mode button').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
       }
+
+      // Wire the mode toggle once, at script load.
+      document.querySelectorAll('#hm-mode button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const m = btn.dataset.mode;
+          if (m === _hmState.mode) return;
+          if (m === 'sentiment' && !_hmState.sentGrid) return;
+          _hmState.mode = m;
+          renderHeatmap();
+        });
+      });
 
       function renderVocab(words) {
         document.querySelector('#block06 .vocab-list').innerHTML = words
@@ -1431,20 +1649,183 @@
         const cards = document.querySelectorAll('#block07 .engage-card');
         if (top && cards[0]) {
           cards[0].querySelector('.engage-post').textContent = `"${top.text.slice(0, 180)}"`;
-          cards[0].querySelector('.engage-meta').innerHTML   = `<span>♥ ${fmt(top.likeCount)}</span><span>↻ ${fmt(top.repostCount)}</span><span>${fmtShortDate(top.createdAt)}</span>`;
+          cards[0].querySelector('.engage-meta').innerHTML = `<span>♥ ${fmt(top.likeCount)}</span><span>↻ ${fmt(top.repostCount)}</span><span>${fmtShortDate(top.createdAt)}</span>`;
         }
         if (bottom && cards[1]) {
           cards[1].querySelector('.engage-post').textContent = `"${bottom.text.slice(0, 180)}"`;
-          cards[1].querySelector('.engage-meta').innerHTML   = `<span>♥ ${bottom.likeCount}</span><span>↻ ${bottom.repostCount}</span><span>${fmtShortDate(bottom.createdAt)}</span>`;
+          cards[1].querySelector('.engage-meta').innerHTML = `<span>♥ ${bottom.likeCount}</span><span>↻ ${bottom.repostCount}</span><span>${fmtShortDate(bottom.createdAt)}</span>`;
+        }
+      }
+
+      function renderMoodChart(series) {
+        const svg = document.getElementById('mood-chart');
+        if (!svg) return;
+        // Wipe any previously rendered data path (keep zero line + labels)
+        svg.querySelectorAll('[data-generated]').forEach(el => el.remove());
+
+        const anno = document.getElementById('mood-anno');
+        const annoHd = document.getElementById('mood-anno-hd');
+        const annoBody = document.getElementById('mood-anno-body');
+        const title = document.getElementById('block05-title');
+
+        if (!series.length) {
+          if (anno) anno.style.display = 'none';
+          if (title) title.textContent = 'sentiment timeline · no data';
+          return;
+        }
+
+        const W = 800, H = 180, MID = 90;
+        // Compound is bounded to [-1, 1] — map to full vertical range.
+        const xAt = i => series.length === 1 ? W / 2 : (i / (series.length - 1)) * W;
+        const yAt = v => MID - v * (MID - 8);
+
+        const line = series.map((d, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(1)},${yAt(d.avg).toFixed(1)}`).join(' ');
+        const fill = line + ` L${W},${H} L0,${H} Z`;
+
+        const ns = 'http://www.w3.org/2000/svg';
+        const defs = svg.querySelector('defs') || svg.appendChild(document.createElementNS(ns, 'defs'));
+        defs.innerHTML = `
+          <linearGradient id="moodFillPos" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#c8f050" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#c8f050" stop-opacity="0"/>
+          </linearGradient>`;
+        defs.setAttribute('data-generated', '1');
+
+        const fillPath = document.createElementNS(ns, 'path');
+        fillPath.setAttribute('d', fill);
+        fillPath.setAttribute('fill', 'url(#moodFillPos)');
+        fillPath.setAttribute('data-generated', '1');
+        svg.appendChild(fillPath);
+
+        const linePath = document.createElementNS(ns, 'path');
+        linePath.setAttribute('d', line);
+        linePath.setAttribute('fill', 'none');
+        linePath.setAttribute('stroke', '#c8f050');
+        linePath.setAttribute('stroke-width', '1.5');
+        linePath.setAttribute('data-generated', '1');
+        svg.appendChild(linePath);
+
+        // Mark the single worst day as an "event" annotation
+        let worstI = 0;
+        for (let i = 1; i < series.length; i++) {
+          if (series[i].avg < series[worstI].avg) worstI = i;
+        }
+        const worst = series[worstI];
+        if (worst.avg < -0.1) {
+          const cx = xAt(worstI), cy = yAt(worst.avg);
+          const dot = document.createElementNS(ns, 'circle');
+          dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); dot.setAttribute('r', '4');
+          dot.setAttribute('fill', '#f05078');
+          dot.setAttribute('data-generated', '1');
+          svg.appendChild(dot);
+          const vline = document.createElementNS(ns, 'line');
+          vline.setAttribute('x1', cx); vline.setAttribute('x2', cx);
+          vline.setAttribute('y1', cy); vline.setAttribute('y2', 30);
+          vline.setAttribute('stroke', '#f05078');
+          vline.setAttribute('stroke-dasharray', '2,2');
+          vline.setAttribute('stroke-width', '0.5');
+          vline.setAttribute('data-generated', '1');
+          svg.appendChild(vline);
+          const txt = document.createElementNS(ns, 'text');
+          const anchor = cx > W - 120 ? 'end' : 'start';
+          txt.setAttribute('x', anchor === 'end' ? cx - 5 : cx + 5);
+          txt.setAttribute('y', '28');
+          txt.setAttribute('fill', '#f05078');
+          txt.setAttribute('font-family', 'DM Mono');
+          txt.setAttribute('font-size', '8');
+          txt.setAttribute('text-anchor', anchor);
+          txt.setAttribute('data-generated', '1');
+          txt.textContent = `↓ TROUGH · ${fmtShortDate(worst.day)} · ${worst.avg.toFixed(2)}`;
+          svg.appendChild(txt);
+
+          if (anno) {
+            anno.style.display = '';
+            annoHd.textContent = `trough · ${fmtShortDate(worst.day)} →`;
+            annoBody.textContent = `7-day rolling compound bottomed at ${worst.avg.toFixed(2)}. first vs last window: ${series[0].avg.toFixed(2)} → ${series[series.length - 1].avg.toFixed(2)}.`;
+          }
+        } else if (anno) {
+          anno.style.display = '';
+          annoHd.textContent = `range ${series[0].day} → ${series[series.length - 1].day}`;
+          annoBody.textContent = `7-day rolling compound stayed above −0.1 across the window. first vs last: ${series[0].avg.toFixed(2)} → ${series[series.length - 1].avg.toFixed(2)}.`;
+        }
+
+        if (title) title.textContent = `sentiment timeline · ${series.length}d`;
+      }
+
+      function renderSentimentBreakdown(stats) {
+        const bar = document.getElementById('sent-bar');
+        const sub = document.getElementById('block10-sub');
+        const avgEl = document.getElementById('sent-avg');
+        const engageEl = document.getElementById('sent-engage');
+        const lateEl = document.getElementById('sent-latenight');
+        const worstEl = document.getElementById('sent-worsthour');
+        const countsEl = document.getElementById('sent-counts');
+
+        if (!stats) {
+          if (bar) bar.innerHTML = '';
+          if (sub) sub.textContent = 'no sentiment data · run analyze_sentiment.py';
+          [avgEl, engageEl, lateEl, worstEl, countsEl].forEach(el => { if (el) el.textContent = '—'; });
+          return;
+        }
+
+        if (sub) sub.textContent = `${stats.scored.toLocaleString()} scored · replies excluded`;
+
+        if (bar) {
+          const total = stats.scored || 1;
+          const segs = [
+            { flex: stats.posCount, bg: 'var(--accent)', label: 'POS' },
+            { flex: stats.neuCount, bg: 'var(--accent2)', label: 'NEU' },
+            { flex: stats.negCount, bg: '#f05078', label: 'NEG' },
+          ].filter(s => s.flex > 0);
+          bar.innerHTML = segs.map(s => {
+            const pct = Math.round(s.flex / total * 100);
+            return `<div style="flex:${s.flex};background:${s.bg};display:grid;place-items:center;font-size:0.55rem;color:var(--bg);font-weight:700;letter-spacing:0.05em;">${pct}% ${s.label}</div>`;
+          }).join('');
+        }
+
+        if (avgEl) {
+          avgEl.textContent = stats.avg.toFixed(3);
+          avgEl.style.color = stats.avg < 0 ? '#f05078' : 'var(--accent)';
+        }
+
+        if (engageEl) {
+          if (stats.engagementDelta === null || stats.engagementSample < 6) {
+            engageEl.textContent = 'insufficient sample';
+            engageEl.style.color = 'var(--muted)';
+          } else {
+            const sign = stats.engagementDelta > 0 ? '+' : '';
+            engageEl.textContent = `${sign}${stats.engagementDelta}% (${stats.negLikeAvg.toFixed(1)} vs ${stats.posLikeAvg.toFixed(1)} likes)`;
+            engageEl.style.color = stats.engagementDelta > 0 ? '#f05078' : 'var(--accent)';
+          }
+        }
+
+        if (lateEl) {
+          const gap = stats.lateAvg - stats.dayAvg;
+          const sign = gap < 0 ? '' : '+';
+          lateEl.textContent = `${stats.lateAvg.toFixed(2)} vs ${stats.dayAvg.toFixed(2)} (${sign}${gap.toFixed(2)})`;
+          lateEl.style.color = gap < 0 ? '#f05078' : 'var(--accent)';
+        }
+
+        if (worstEl) {
+          if (stats.worstHour < 0) {
+            worstEl.textContent = '—';
+          } else {
+            worstEl.textContent = `${padHour(stats.worstHour)} · compound ${stats.worstAvg.toFixed(2)}`;
+            worstEl.style.color = '#f05078';
+          }
+        }
+
+        if (countsEl) {
+          countsEl.textContent = `${stats.scored.toLocaleString()} · ${stats.skippedReplies.toLocaleString()}`;
         }
       }
 
       function renderInteractionWeb({ targets, total }) {
         if (!targets.length) return;
-        const list     = document.querySelector('#block09 .web-list');
+        const list = document.querySelector('#block09 .web-list');
         const maxCount = targets[0][1];
         list.innerHTML = targets.map(([handle, count], i) => {
-          const pct     = Math.round(count / maxCount * 100);
+          const pct = Math.round(count / maxCount * 100);
           const flagged = i === 0 && count / total > 0.3 ? 'flagged' : '';
           return `<div class="web-row ${flagged}">
             <span class="web-rank">${String(i + 1).padStart(2, '0')}</span>
@@ -1458,7 +1839,7 @@
           const topPct = total > 0 ? Math.round(targets[0][1] / total * 100) : 0;
           if (topPct > 30) {
             flagEl.style.display = '';
-            flagEl.textContent   = `⚠ FLAG · ${topPct}% of all replies directed at one (1) account. investigate parasocial entanglement.`;
+            flagEl.textContent = `⚠ FLAG · ${topPct}% of all replies directed at one (1) account. investigate parasocial entanglement.`;
           } else {
             flagEl.style.display = 'none';
           }
@@ -1474,15 +1855,21 @@
           if (!scan.posts?.length) return;
 
           DAYS = scan.windowDays || 90;
-          const posts        = scan.posts;
+          const posts = scan.posts;
           const didHandleMap = scan.didHandleMap || {};
 
           renderProfile(scan.profile);
-          renderHeatmap(buildHeatgrid(posts));
+          const sentPresent = hasSentiment(posts);
+          setHeatmapData(
+            buildHeatgrid(posts),
+            sentPresent ? buildSentimentGrid(posts) : null,
+          );
           renderVocab(topWords(posts));
           renderPostingStats(postingStats(posts));
           renderEngagement(engagementStats(posts));
           renderInteractionWeb(replyTargets(posts, didHandleMap));
+          renderMoodChart(sentPresent ? moodOverTime(posts) : []);
+          renderSentimentBreakdown(sentPresent ? sentimentStats(posts) : null);
 
           const when = scan.scannedAt
             ? new Date(scan.scannedAt).toLocaleString()
@@ -1502,11 +1889,11 @@
         for (let d = 0; d < 7; d++) for (let h = 0; h < 24; h++) {
           let v = rand() * 0.3;
           if (h >= 20 || h <= 3) v += rand() * 0.7;
-          if (h >= 4  && h <= 9) v *= 0.2;
+          if (h >= 4 && h <= 9) v *= 0.2;
           if (d >= 5) v *= 1.2;
           grid[d][h] = Math.round(Math.min(1, v) * 40);
         }
-        renderHeatmap(grid);
+        setHeatmapData(grid, null);
       })();
 
       // ── Main orchestration ─────────────────────────────────
@@ -1523,7 +1910,7 @@
 
           // 2. DID document → PDS endpoint
           setStatus(`resolving PDS for ${profile.did}…`);
-          const pds     = await resolvePds(profile.did);
+          const pds = await resolvePds(profile.did);
           const pdsHost = new URL(pds).hostname;
 
           // 3. PDS post records + AppView engagement counts (parallel)
@@ -1556,11 +1943,17 @@
           const didHandleMap = await resolveDidHandles(topDids);
 
           // 6. Render all blocks
-          renderHeatmap(buildHeatgrid(posts));
+          const sentPresent = hasSentiment(posts);
+          setHeatmapData(
+            buildHeatgrid(posts),
+            sentPresent ? buildSentimentGrid(posts) : null,
+          );
           renderVocab(topWords(posts));
           renderPostingStats(postingStats(posts));
           renderEngagement(engagementStats(posts));
           renderInteractionWeb(replyTargets(posts, didHandleMap));
+          renderMoodChart(sentPresent ? moodOverTime(posts) : []);
+          renderSentimentBreakdown(sentPresent ? sentimentStats(posts) : null);
 
           setStatus(`scan complete · ${posts.length} posts · PDS: ${pdsHost} · ${DAYS}d window`);
         } catch (err) {

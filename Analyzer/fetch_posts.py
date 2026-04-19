@@ -40,10 +40,12 @@ def resolve_pds(did):
 
 def list_pds_posts(pds, did, window_days, max_posts):
     records = []
-    cutoff_ms = (datetime.now(timezone.utc).timestamp() - window_days * 86400) * 1000
+    unlimited_days = window_days is None or window_days <= 0
+    unlimited_max = max_posts is None or max_posts <= 0
+    cutoff_ms = None if unlimited_days else (datetime.now(timezone.utc).timestamp() - window_days * 86400) * 1000
     cursor = None
 
-    while len(records) < max_posts:
+    while unlimited_max or len(records) < max_posts:
         params = {'repo': did, 'collection': 'app.bsky.feed.post', 'limit': '100'}
         if cursor:
             params['cursor'] = cursor
@@ -66,10 +68,13 @@ def list_pds_posts(pds, did, window_days, max_posts):
             except Exception:
                 done = True
                 break
-            if ts < cutoff_ms:
+            if cutoff_ms is not None and ts < cutoff_ms:
                 done = True
                 break
             records.append(rec)
+            if not unlimited_max and len(records) >= max_posts:
+                done = True
+                break
 
         print(f'  {len(records)} records fetched...', end='\r', flush=True)
         if done or not body.get('cursor'):
@@ -142,8 +147,8 @@ def normalize_posts(records, engagement_map):
 def main():
     parser = argparse.ArgumentParser(description='Fetch Bluesky posts and save to scan.json')
     parser.add_argument('handle', help='Bluesky handle (e.g. @user.bsky.social or user.bsky.social)')
-    parser.add_argument('--days', type=int, default=90, help='Days to look back (default: 90)')
-    parser.add_argument('--max', type=int, default=10000, help='Max posts to fetch (default: 10000)')
+    parser.add_argument('--days', type=int, default=0, help='Days to look back (0 = no limit, default: 0)')
+    parser.add_argument('--max', type=int, default=0, help='Max posts to fetch (0 = no limit, default: 0)')
     parser.add_argument('--out', default='scan.json', help='Output file (default: scan.json)')
     args = parser.parse_args()
 
@@ -171,7 +176,9 @@ def main():
     engagement_map = get_engagement_map(profile['handle'])
     print(f'      {len(engagement_map)} posts with engagement data')
 
-    print(f'[4/5] Streaming posts from PDS (last {args.days} days, max {args.max})...')
+    days_desc = 'all time' if args.days <= 0 else f'last {args.days} days'
+    max_desc = 'unlimited' if args.max <= 0 else f'max {args.max}'
+    print(f'[4/5] Streaming posts from PDS ({days_desc}, {max_desc})...')
     records = list_pds_posts(pds, did, args.days, args.max)
     posts = normalize_posts(records, engagement_map)
     print(f'      {len(posts)} posts')
