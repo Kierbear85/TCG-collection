@@ -1,0 +1,1549 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>bsky diagnostic // analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Unbounded:wght@400;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    /* ── Analyzer-specific ── */
+    main.analyzer {
+      max-width: 1200px;
+    }
+
+    /* Scan bar */
+    .scan {
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .scan-prefix {
+      display: flex;
+      align-items: center;
+      padding: 0 0.75rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border-right: 1px solid var(--border);
+    }
+
+    .scan input {
+      flex: 1;
+      min-width: 200px;
+      background: transparent;
+      border: 0;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      padding: 0.5rem 0.75rem;
+      outline: none;
+    }
+
+    .scan input::placeholder {
+      color: var(--muted);
+    }
+
+    .scan button {
+      background: var(--accent);
+      color: var(--bg);
+      border: 0;
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 0.6rem 1.25rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .scan button:hover {
+      background: var(--accent2);
+    }
+
+    .scan button:active {
+      transform: scale(0.97);
+    }
+
+    .scan-status {
+      padding: 0.5rem 1rem;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .scan-status .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.25;
+      }
+    }
+
+    /* Block layout */
+    .blocks {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1rem;
+    }
+
+    .block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .block-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .block-id {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+    }
+
+    .block-title {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: -0.01em;
+    }
+
+    .block-sub {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Spans */
+    .span-3 {
+      grid-column: span 3;
+    }
+
+    .span-4 {
+      grid-column: span 4;
+    }
+
+    .span-5 {
+      grid-column: span 5;
+    }
+
+    .span-6 {
+      grid-column: span 6;
+    }
+
+    .span-7 {
+      grid-column: span 7;
+    }
+
+    .span-8 {
+      grid-column: span 8;
+    }
+
+    .span-9 {
+      grid-column: span 9;
+    }
+
+    .span-12 {
+      grid-column: span 12;
+    }
+
+    /* Profile card */
+    .profile {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--bg);
+    }
+
+    .profile-info h3 {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 1.4rem;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-handle {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-classification {
+      display: inline-block;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      padding: 0.2rem 0.5rem;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    .classification-terminal {
+      border-color: #f05078;
+      color: #f05078;
+    }
+
+    /* Stat strip */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border);
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .stat-num {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-num.accent {
+      color: var(--accent);
+    }
+
+    .stat-num.accent2 {
+      color: var(--accent2);
+    }
+
+    .stat-num.warn {
+      color: #f05078;
+    }
+
+    .stat-label {
+      font-size: 0.52rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* Circadian heatmap */
+    .heatmap {
+      display: grid;
+      grid-template-columns: 30px repeat(24, 1fr);
+      gap: 2px;
+      margin-top: 0.5rem;
+    }
+
+    .hm-corner {}
+
+    .hm-hour {
+      font-size: 0.45rem;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .hm-day {
+      font-size: 0.52rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      padding-right: 0.25rem;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
+    }
+    .hm-day:hover { color: var(--accent); }
+    .hm-day.hm-day-active { color: var(--accent); }
+
+    /* Day-detail bar chart panel */
+    .hm-detail {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      background: rgba(200, 240, 80, 0.02);
+      display: none;
+    }
+    .hm-detail.active { display: block; }
+    .hm-detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .hm-detail-close {
+      color: var(--accent);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+    }
+    .hm-detail-close:hover { opacity: 0.7; }
+    .hm-detail-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.5rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      margin-top: 0.4rem;
+    }
+
+    .hm-cell {
+      aspect-ratio: 1;
+      background: #1a1a28;
+      border-radius: 2px;
+      position: relative;
+      transition: transform 0.15s;
+    }
+
+    .hm-cell:hover {
+      transform: scale(1.4);
+      z-index: 5;
+      outline: 1px solid var(--accent);
+    }
+
+    .hm-legend {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 0.75rem;
+      font-size: 0.52rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .hm-legend-scale {
+      display: flex;
+      gap: 2px;
+    }
+
+    .hm-legend-scale span {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    /* Sentiment chart */
+    .sentiment-chart {
+      width: 100%;
+      height: 180px;
+      display: block;
+    }
+
+    .sentiment-anno {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-left: 2px solid #f05078;
+      background: rgba(240, 80, 120, 0.05);
+    }
+
+    .sentiment-anno strong {
+      color: #f05078;
+      font-weight: 400;
+    }
+
+    /* Vocabulary */
+    .vocab-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .vocab-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.75rem;
+      align-items: center;
+      font-size: 0.7rem;
+    }
+
+    .vocab-word {
+      font-family: 'DM Mono', monospace;
+      position: relative;
+      padding: 0.3rem 0.5rem;
+      background: rgba(200, 240, 80, 0.04);
+      border-left: 2px solid var(--accent);
+    }
+
+    .vocab-count {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .meta-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border);
+    }
+
+    .meta-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.65rem;
+    }
+
+    .meta-metric-label {
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .meta-metric-val {
+      font-family: 'Unbounded', sans-serif;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Tag cloud */
+    .topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .topic {
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .topic.t1 {
+      font-size: 1.1rem;
+      border-color: var(--accent);
+      color: var(--accent);
+      padding: 0.4rem 0.8rem;
+    }
+
+    .topic.t2 {
+      font-size: 0.9rem;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .topic.t3 {
+      font-size: 0.75rem;
+      color: var(--text);
+    }
+
+    /* Interaction web */
+    .web-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .web-row {
+      display: grid;
+      grid-template-columns: 20px 1fr 40px 50px;
+      gap: 0.75rem;
+      align-items: center;
+      font-size: 0.7rem;
+      padding: 0.3rem 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .web-rank {
+      color: var(--muted);
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+    }
+
+    .web-handle {
+      color: var(--text);
+    }
+
+    .web-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .web-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      background: var(--accent);
+      width: var(--pct, 50%);
+    }
+
+    .web-count {
+      font-size: 0.55rem;
+      color: var(--muted);
+      text-align: right;
+      letter-spacing: 0.08em;
+    }
+
+    .web-row.flagged .web-handle {
+      color: #f05078;
+    }
+
+    .web-row.flagged .web-bar::before {
+      background: #f05078;
+    }
+
+    /* Engagement */
+    .engage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .engage-card {
+      padding: 0.75rem;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+    }
+
+    .engage-card h4 {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 0.6rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .engage-post {
+      font-size: 0.68rem;
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .engage-meta {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* Verdict block */
+    .verdict {
+      background: linear-gradient(180deg, rgba(200, 240, 80, 0.04), transparent);
+      border-color: var(--accent);
+    }
+
+    .verdict::before {
+      background: var(--accent);
+      width: 100%;
+      height: 2px;
+    }
+
+    .verdict-text {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .verdict-prognosis {
+      padding: 1rem;
+      border: 1px solid var(--accent);
+      background: rgba(200, 240, 80, 0.05);
+      font-family: 'Unbounded', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+    }
+
+    .verdict-prognosis strong {
+      color: var(--accent);
+    }
+
+    /* Mobile */
+    @media (max-width: 900px) {
+      .blocks {
+        grid-template-columns: repeat(6, 1fr);
+      }
+
+      .span-3,
+      .span-4,
+      .span-5,
+      .span-6,
+      .span-7,
+      .span-8,
+      .span-9,
+      .span-12 {
+        grid-column: span 6;
+      }
+
+      .heatmap {
+        grid-template-columns: 24px repeat(24, 1fr);
+      }
+
+      .hm-hour:nth-child(even) {
+        display: none;
+      }
+
+      .engage-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .stat-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <span class="site-label">// terminal ~ diagnostic mode</span>
+    <h1>bluesky<br><span>autopsy.</span></h1>
+    <p class="subtitle">forensic analysis of any public account. posting patterns, sentiment drift, vocabulary
+      fingerprints, and diagnostic verdicts generated from the last 90 days of activity.</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <span class="breadcrumb-label">path</span>
+    <span class="breadcrumb-path"><a href="#">home</a> / tools / <strong>bsky-autopsy</strong></span>
+  </nav>
+
+  <main class="analyzer">
+
+    <!-- ── SCAN INPUT ── -->
+    <form class="scan" id="scan-form">
+      <span class="scan-prefix">target</span>
+      <input type="text" placeholder="@handle.bsky.social" value="@dril.bsky.social" />
+      <button type="submit">run diagnostic →</button>
+    </form>
+
+    <div class="scan-status">
+      <span class="dot"></span>
+      <span>scan complete · 2,847 posts analyzed · last updated 12s ago</span>
+    </div>
+
+    <!-- ── DIAGNOSTIC BLOCKS ── -->
+    <div class="blocks">
+
+      <!-- 01 SUBJECT PROFILE -->
+      <section class="block span-5" id="block01">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 01</div>
+            <div class="block-title">subject profile</div>
+          </div>
+          <div class="block-sub">id · vitals</div>
+        </div>
+
+        <div class="profile">
+          <div class="avatar">D</div>
+          <div class="profile-info">
+            <h3>wint</h3>
+            <div class="profile-handle">@dril.bsky.social · joined may 2023</div>
+            <span class="profile-classification classification-terminal">classification: terminal poster</span>
+          </div>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat"><span class="stat-num">2.1M</span><span class="stat-label">followers</span></div>
+          <div class="stat"><span class="stat-num">412</span><span class="stat-label">following</span></div>
+          <div class="stat"><span class="stat-num accent">14,402</span><span class="stat-label">skeets</span></div>
+          <div class="stat"><span class="stat-num warn">5,104</span><span class="stat-label">ratio</span></div>
+        </div>
+      </section>
+
+      <!-- 02 POSTING RHYTHM (small stats) -->
+      <section class="block span-4" id="block02">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 02</div>
+            <div class="block-title">posting rhythm</div>
+          </div>
+          <div class="block-sub">tempo</div>
+        </div>
+
+        <div class="stat-strip" style="grid-template-columns: 1fr 1fr; margin-top: 0; border-top: 0; padding-top: 0;">
+          <div class="stat"><span class="stat-num accent">14.2</span><span class="stat-label">posts / day avg</span>
+          </div>
+          <div class="stat"><span class="stat-num accent2">3:47am</span><span class="stat-label">confession hour</span>
+          </div>
+          <div class="stat"><span class="stat-num">9:12pm</span><span class="stat-label">peak engagement</span></div>
+          <div class="stat"><span class="stat-num warn">62%</span><span class="stat-label">posts past midnight</span>
+          </div>
+        </div>
+
+        <div class="meta-metrics" style="grid-template-columns: 1fr;">
+          <div class="meta-metric">
+            <span class="meta-metric-label">inferred sleep window</span>
+            <span class="meta-metric-val">04:20 — 09:15</span>
+          </div>
+          <div class="meta-metric">
+            <span class="meta-metric-label">longest posting streak</span>
+            <span class="meta-metric-val">47 days</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 THREAT LEVEL -->
+      <section class="block span-3">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 03</div>
+            <div class="block-title">threat level</div>
+          </div>
+        </div>
+        <div style="text-align: center; padding: 1rem 0;">
+          <div
+            style="font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 3rem; color: #f05078; line-height: 1;">
+            87</div>
+          <div
+            style="font-size: 0.55rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.25rem;">
+            /100 unhinged index</div>
+        </div>
+        <div
+          style="font-size: 0.6rem; color: var(--muted); line-height: 1.5; border-top: 1px dashed var(--border); padding-top: 0.75rem; margin-top: 0.5rem;">
+          elevated. subject exhibits late-night posting cycles, high em-dash usage, and a concerning reply ratio to one
+          (1) specific mutual.
+        </div>
+      </section>
+
+      <!-- 04 CIRCADIAN HEATMAP -->
+      <section class="block span-12">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 04</div>
+            <div class="block-title">circadian heatmap</div>
+          </div>
+          <div class="block-sub">when do they never sleep</div>
+        </div>
+
+        <div class="heatmap" id="heatmap">
+          <!-- built by js -->
+        </div>
+
+        <div class="hm-legend">
+          <span>less</span>
+          <div class="hm-legend-scale">
+            <span style="background:#1a1a28"></span>
+            <span style="background:#2a3a1a"></span>
+            <span style="background:#4a6a20"></span>
+            <span style="background:#7aa830"></span>
+            <span style="background:#c8f050"></span>
+          </div>
+          <span>more · dark cells = silence · click a day label to expand</span>
+        </div>
+
+        <div class="hm-detail" id="hm-detail"></div>
+      </section>
+
+      <!-- 05 SENTIMENT TIMELINE -->
+      <section class="block span-8">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 05</div>
+            <div class="block-title">sentiment timeline · 90d</div>
+          </div>
+          <div class="block-sub">mood drift</div>
+        </div>
+
+        <!-- SENTIMENT ANALYSIS SLOT — replace points with real scores -->
+        <svg class="sentiment-chart" viewBox="0 0 800 180" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sentFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#c8f050" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#c8f050" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <!-- zero line -->
+          <line x1="0" y1="90" x2="800" y2="90" stroke="#2a2a3e" stroke-dasharray="2,4" />
+          <!-- positive band label -->
+          <text x="4" y="14" fill="#5a5a7a" font-family="DM Mono" font-size="8" letter-spacing="1">+ POSITIVE</text>
+          <text x="4" y="175" fill="#5a5a7a" font-family="DM Mono" font-size="8" letter-spacing="1">− NEGATIVE</text>
+
+          <!-- fill -->
+          <path
+            d="M0,80 L50,60 L100,70 L150,40 L200,55 L250,85 L300,100 L350,140 L400,155 L450,120 L500,90 L550,70 L600,95 L650,110 L700,75 L750,50 L800,65 L800,180 L0,180 Z"
+            fill="url(#sentFill)" />
+          <!-- line -->
+          <path
+            d="M0,80 L50,60 L100,70 L150,40 L200,55 L250,85 L300,100 L350,140 L400,155 L450,120 L500,90 L550,70 L600,95 L650,110 L700,75 L750,50 L800,65"
+            fill="none" stroke="#c8f050" stroke-width="1.5" />
+
+          <!-- annotation marker -->
+          <circle cx="400" cy="155" r="4" fill="#f05078" />
+          <line x1="400" y1="155" x2="400" y2="30" stroke="#f05078" stroke-dasharray="2,2" stroke-width="0.5" />
+          <text x="405" y="28" fill="#f05078" font-family="DM Mono" font-size="8" letter-spacing="0.5">↓ EVENT · mar
+            14</text>
+        </svg>
+
+        <div class="sentiment-anno">
+          <strong>anomaly detected · march 14 →</strong> sentiment dropped 3.2σ below baseline. 47 posts in 6 hours, 89%
+          containing em-dashes. recovery achieved over 12 days.
+        </div>
+      </section>
+
+      <!-- 06 VOCABULARY FINGERPRINT -->
+      <section class="block span-4" id="block06">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 06</div>
+            <div class="block-title">vocab fingerprint</div>
+          </div>
+          <div class="block-sub">top words</div>
+        </div>
+
+        <div class="vocab-list">
+          <div class="vocab-row">
+            <div class="vocab-word">absolutely</div><span class="vocab-count">312×</span>
+          </div>
+          <div class="vocab-row">
+            <div class="vocab-word">literally</div><span class="vocab-count">284×</span>
+          </div>
+          <div class="vocab-row">
+            <div class="vocab-word">unhinged</div><span class="vocab-count">198×</span>
+          </div>
+          <div class="vocab-row">
+            <div class="vocab-word">crashout</div><span class="vocab-count">141×</span>
+          </div>
+          <div class="vocab-row">
+            <div class="vocab-word">ykwim</div><span class="vocab-count">97×</span>
+          </div>
+        </div>
+
+        <div class="meta-metrics">
+          <div class="meta-metric"><span class="meta-metric-label">em-dashes</span><span
+              class="meta-metric-val">1,204</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">all lowercase</span><span
+              class="meta-metric-val">84%</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">? / . ratio</span><span
+              class="meta-metric-val">3.1:1</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">tilde usage ~</span><span
+              class="meta-metric-val">severe</span></div>
+        </div>
+      </section>
+
+      <!-- 07 ENGAGEMENT FORENSICS -->
+      <section class="block span-7" id="block07">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 07</div>
+            <div class="block-title">engagement forensics</div>
+          </div>
+          <div class="block-sub">hits & misses</div>
+        </div>
+
+        <div class="engage-grid">
+          <div class="engage-card">
+            <h4>→ biggest hit</h4>
+            <p class="engage-post">"i will not be taking questions at this time because i have already answered them all
+              in my head"</p>
+            <div class="engage-meta"><span>♥ 48.2k</span><span>↻ 12k</span><span>mar 09</span></div>
+          </div>
+          <div class="engage-card">
+            <h4>→ died on arrival</h4>
+            <p class="engage-post">"thinking about the concept of soup"</p>
+            <div class="engage-meta"><span>♥ 4</span><span>↻ 0</span><span>feb 22</span></div>
+          </div>
+          <div class="engage-card">
+            <h4>→ self-reply chains</h4>
+            <p class="engage-post">longest thread: <strong style="color:var(--accent)">31 posts</strong> · no one asked
+              · subject: bread</p>
+            <div class="engage-meta"><span>avg thread length</span><span>7.4 posts</span></div>
+          </div>
+        </div>
+
+        <div class="meta-metrics" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="meta-metric"><span class="meta-metric-label">QP : RP ratio</span><span class="meta-metric-val">0.3
+              (brave)</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">orig : repost</span><span class="meta-metric-val">4.1
+              : 1</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">best hour</span><span class="meta-metric-val">9pm
+              tue</span></div>
+        </div>
+      </section>
+
+      <!-- 08 OBSESSION MAP -->
+      <section class="block span-5">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 08</div>
+            <div class="block-title">obsession map</div>
+          </div>
+          <div class="block-sub">topics · ranked</div>
+        </div>
+
+        <div class="topics">
+          <span class="topic t1">#discourse</span>
+          <span class="topic t1">#posting</span>
+          <span class="topic t2">#thecity</span>
+          <span class="topic t2">#ai</span>
+          <span class="topic t2">#brooklyn</span>
+          <span class="topic t3">#movies</span>
+          <span class="topic t3">#frogs</span>
+          <span class="topic t3">#parasocial</span>
+          <span class="topic">#coffee</span>
+          <span class="topic">#weather</span>
+          <span class="topic">#lunch</span>
+          <span class="topic">#anxiety</span>
+          <span class="topic">#bread</span>
+        </div>
+
+        <div
+          style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border); font-size: 0.65rem; color: var(--muted); line-height: 1.5;">
+          subject has mentioned <span style="color:var(--accent)">"the discourse"</span> 284× in 90 days. no one has
+          asked them to weigh in.
+        </div>
+      </section>
+
+      <!-- 09 INTERACTION WEB -->
+      <section class="block span-6" id="block09">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 09</div>
+            <div class="block-title">interaction web</div>
+          </div>
+          <div class="block-sub">replies · who</div>
+        </div>
+
+        <div class="web-list">
+          <div class="web-row flagged"><span class="web-rank">01</span><span
+              class="web-handle">@mutual.bsky.social</span>
+            <div class="web-bar" style="--pct:100%"></div><span class="web-count">412</span>
+          </div>
+          <div class="web-row"><span class="web-rank">02</span><span class="web-handle">@poster.bsky.social</span>
+            <div class="web-bar" style="--pct:58%"></div><span class="web-count">241</span>
+          </div>
+          <div class="web-row"><span class="web-rank">03</span><span class="web-handle">@friend.bsky.social</span>
+            <div class="web-bar" style="--pct:45%"></div><span class="web-count">187</span>
+          </div>
+          <div class="web-row"><span class="web-rank">04</span><span class="web-handle">@guy.bsky.social</span>
+            <div class="web-bar" style="--pct:34%"></div><span class="web-count">142</span>
+          </div>
+          <div class="web-row"><span class="web-rank">05</span><span class="web-handle">@online.bsky.social</span>
+            <div class="web-bar" style="--pct:28%"></div><span class="web-count">117</span>
+          </div>
+          <div class="web-row"><span class="web-rank">06</span><span class="web-handle">@person.bsky.social</span>
+            <div class="web-bar" style="--pct:22%"></div><span class="web-count">93</span>
+          </div>
+        </div>
+
+        <div id="reply-flag"
+          style="margin-top: 1rem; padding: 0.75rem; border: 1px solid #f05078; background: rgba(240, 80, 120, 0.05); font-size: 0.62rem; color: #f05078; letter-spacing: 0.05em;">
+          ⚠ FLAG · 41% of all replies directed at one (1) account. investigate parasocial entanglement.
+        </div>
+      </section>
+
+      <!-- 10 SENTIMENT BREAKDOWN -->
+      <section class="block span-6">
+        <div class="block-head">
+          <div>
+            <div class="block-id">BLOCK 10</div>
+            <div class="block-title">sentiment breakdown</div>
+          </div>
+          <div class="block-sub">emotional composition</div>
+        </div>
+
+        <!-- SENTIMENT ANALYSIS SLOT · stacked bar -->
+        <div style="display: flex; height: 24px; border-radius: 3px; overflow: hidden; margin-bottom: 1rem;">
+          <div
+            style="flex: 38; background: var(--accent); display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700; letter-spacing: 0.05em;">
+            38% POS</div>
+          <div
+            style="flex: 27; background: var(--accent2); display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700;">
+            27% NEU</div>
+          <div
+            style="flex: 24; background: #f05078; display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700;">
+            24% NEG</div>
+          <div
+            style="flex: 11; background: #8050f0; display: grid; place-items: center; font-size: 0.55rem; color: var(--bg); font-weight: 700;">
+            11% ???</div>
+        </div>
+
+        <div class="meta-metrics" style="grid-template-columns: 1fr; margin-top: 0; padding-top: 0; border-top: 0;">
+          <div class="meta-metric"><span class="meta-metric-label">dominant emotion</span><span class="meta-metric-val"
+              style="color:var(--accent)">defiant joy</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">subtext detected</span><span class="meta-metric-val"
+              style="color:#f05078">yearning</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">sincerity score</span><span
+              class="meta-metric-val">12 / 100</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">bit-to-truth ratio</span><span
+              class="meta-metric-val">8.4 : 1</span></div>
+          <div class="meta-metric"><span class="meta-metric-label">cope detected</span><span class="meta-metric-val"
+              style="color:#f05078">affirmative</span></div>
+        </div>
+      </section>
+
+      <!-- 11 DIAGNOSTIC VERDICT -->
+      <section class="block verdict span-12">
+        <div class="block-head">
+          <div>
+            <div class="block-id">FINAL BLOCK · 11</div>
+            <div class="block-title">diagnostic verdict</div>
+          </div>
+          <div class="block-sub">auto-generated · subject to revision</div>
+        </div>
+
+        <p class="verdict-text">
+          subject demonstrates a severe, advancing case of <em>being online</em>. posting cadence is elevated but
+          non-pathological; sleep patterns suggest the bed is a suggestion rather than a commitment. vocabulary
+          fingerprint is consistent with <strong style="color:var(--accent)">mid-2010s tumblr migrant</strong> (see:
+          em-dash abuse, lowercase adherence, rhetorical question overreliance). engagement forensics reveal a poster
+          who knows their audience and is occasionally brave enough to reply instead of quote. obsession map indicates a
+          recurring fixation on <strong style="color:var(--accent)">"the discourse"</strong> which nobody has asked them
+          to litigate.
+        </p>
+
+        <div class="verdict-prognosis">
+          <strong>prognosis:</strong> will continue posting indefinitely. touch grass unlikely to be therapeutic.
+          recommend monitoring @mutual.bsky.social interaction for signs of escalation.
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <footer>
+    <span>BSKY/AUTOPSY · v0.3.1 · READ-ONLY · NO DATA STORED</span>
+    <span>analysis is a bit · take it easy · <a href="#">docs</a></span>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ── Config ────────────────────────────────────────────
+      const API     = 'https://public.api.bsky.app/xrpc';
+      const PLC_DIR = 'https://plc.directory';
+      const DAYS    = 90;
+      const MAX_POSTS = 1500;
+
+      // ── DOM refs ──────────────────────────────────────────
+      const form       = document.getElementById('scan-form');
+      const input      = form.querySelector('input');
+      const statusText = document.querySelector('.scan-status span:last-child');
+
+      function setStatus(msg) { statusText.textContent = msg; }
+
+      function fmt(n) {
+        if (n == null) return '—';
+        n = Number(n);
+        if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+        return String(n);
+      }
+      function fmtDate(iso)      { return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }); }
+      function fmtShortDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+      function padHour(h)        { return h.toString().padStart(2, '0') + ':00'; }
+
+      // ── Step 1 · AppView profile (DID + social counts) ────
+      async function getProfile(handle) {
+        const r = await fetch(`${API}/app.bsky.actor.getProfile?actor=${encodeURIComponent(handle)}`);
+        if (!r.ok) throw new Error(`profile not found (${r.status})`);
+        return r.json();
+      }
+
+      // ── Step 2 · Resolve DID → PDS endpoint ───────────────
+      // did:plc → plc.directory; did:web → derived from DID
+      async function resolvePds(did) {
+        if (did.startsWith('did:web:')) return 'https://' + did.slice('did:web:'.length);
+        const r = await fetch(`${PLC_DIR}/${encodeURIComponent(did)}`);
+        if (!r.ok) throw new Error(`could not fetch DID document (${r.status})`);
+        const doc = await r.json();
+        const svc = doc.service?.find(s => s.type === 'AtprotoPersonalDataServer');
+        if (!svc) throw new Error('no PDS found in DID document');
+        return svc.serviceEndpoint.replace(/\/$/, '');
+      }
+
+      // ── Step 3 · Stream raw post records from PDS ─────────
+      // com.atproto.repo.listRecords returns { uri, cid, value }
+      // value has: $type, text, createdAt, reply?, embed?, langs?
+      async function listPdsPosts(pds, did) {
+        const records = [];
+        const cutoff  = Date.now() - DAYS * 86400000;
+        let cursor;
+        while (records.length < MAX_POSTS) {
+          const url = new URL(`${pds}/xrpc/com.atproto.repo.listRecords`);
+          url.searchParams.set('repo',       did);
+          url.searchParams.set('collection', 'app.bsky.feed.post');
+          url.searchParams.set('limit',      '100');
+          if (cursor) url.searchParams.set('cursor', cursor);
+          const r = await fetch(url);
+          if (!r.ok) break;
+          const { records: batch = [], cursor: next } = await r.json();
+          if (!batch.length) break;
+          let done = false;
+          for (const rec of batch) {
+            const ts = new Date(rec.value?.createdAt).getTime();
+            if (isNaN(ts) || ts < cutoff) { done = true; break; }
+            records.push(rec);
+          }
+          if (done || !next) break;
+          cursor = next;
+          setStatus(`scanning PDS · ${records.length} records…`);
+        }
+        return records;
+      }
+
+      // ── Step 4 · AppView: recent like/repost counts ────────
+      // PDS does not store engagement counts — pull the latest 100
+      // posts from the AppView and build a URI→counts lookup map.
+      async function getEngagementMap(handle) {
+        const r = await fetch(`${API}/app.bsky.feed.getAuthorFeed?actor=${encodeURIComponent(handle)}&limit=100`);
+        if (!r.ok) return new Map();
+        const { feed = [] } = await r.json();
+        const map = new Map();
+        for (const item of feed) map.set(item.post.uri, { likeCount: item.post.likeCount || 0, repostCount: item.post.repostCount || 0 });
+        return map;
+      }
+
+      // ── Step 5 · Resolve reply-target DIDs → handles ──────
+      // Reply refs in PDS records contain at:// URIs; extract the
+      // DID from position [2] after splitting on '/'.
+      function didFromUri(uri) {
+        return uri?.split('/')?.[2] || null;  // at://DID/collection/rkey
+      }
+
+      // Batch-resolve up to 25 DIDs via AppView getProfiles (one request).
+      // plc.directory is unreliable from the browser; the AppView accepts
+      // DIDs directly as the actor param and always returns the handle.
+      async function resolveDidHandles(dids) {
+        if (!dids.length) return {};
+        try {
+          const params = dids.map(d => `actors[]=${encodeURIComponent(d)}`).join('&');
+          const r = await fetch(`${API}/app.bsky.actor.getProfiles?${params}`);
+          if (!r.ok) return {};
+          const { profiles = [] } = await r.json();
+          const map = {};
+          for (const p of profiles) map[p.did] = p.handle;
+          return map;
+        } catch { return {}; }
+      }
+
+      // ── Normalise PDS records into flat post objects ───────
+      function normalisePosts(pdsRecords, engagementMap) {
+        return pdsRecords.map(rec => ({
+          uri:            rec.uri,
+          createdAt:      rec.value?.createdAt || '',
+          text:           rec.value?.text || '',
+          replyParentUri: rec.value?.reply?.parent?.uri || null,
+          likeCount:      engagementMap.get(rec.uri)?.likeCount   ?? 0,
+          repostCount:    engagementMap.get(rec.uri)?.repostCount ?? 0,
+        }));
+      }
+
+      // ── Analysis ──────────────────────────────────────────
+      function buildHeatgrid(posts) {
+        const grid = Array.from({ length: 7 }, () => new Array(24).fill(0));
+        for (const p of posts) {
+          const d = new Date(p.createdAt);
+          if (isNaN(d)) continue;
+          grid[(d.getDay() + 6) % 7][d.getHours()]++;
+        }
+        return grid;
+      }
+
+      const STOP = new Set(
+        'the a an and or but in on at to for of with is it i you he she we they that this what my your was are have been not be as from by do so if me his her its our their than can will just more about up out had has no all would there when who which how some also into them am did get got like know go going said say make made one two three'.split(' ')
+      );
+
+      function topWords(posts) {
+        const freq = {};
+        for (const p of posts) {
+          for (const w of (p.text.toLowerCase().match(/\b[a-z']{3,}\b/g) || [])) {
+            if (!STOP.has(w)) freq[w] = (freq[w] || 0) + 1;
+          }
+        }
+        return Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      }
+
+      function postingStats(posts) {
+        if (!posts.length) return { perDay: 0, peakHour: 0, lateNightPct: 0, confessionHour: 3, sleepWindow: '—', streak: 0 };
+        const times = posts.map(p => new Date(p.createdAt)).filter(d => !isNaN(d.getTime()));
+        const span  = Math.max(1, (Math.max(...times) - Math.min(...times)) / 86400000);
+        const perDay = (posts.length / span).toFixed(1);
+
+        // Hour distribution
+        const hourCounts = new Array(24).fill(0);
+        times.forEach(t => hourCounts[t.getHours()]++);
+        const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+
+        // % of posts in hours 0–3 (strictly past midnight)
+        const lateNightPct = Math.round(times.filter(t => t.getHours() < 4).length / times.length * 100);
+
+        // "Confession hour" = latest-night hour with most posts (22:00–05:59 window)
+        const lateOnly = new Array(24).fill(0);
+        times.forEach(t => { const h = t.getHours(); if (h >= 22 || h <= 5) lateOnly[h]++; });
+        const confessionHour = lateOnly.indexOf(Math.max(...lateOnly));
+
+        // Inferred sleep window: 6-hour block with fewest posts (wraps midnight)
+        let minSum = Infinity, sleepStart = 4;
+        for (let h = 0; h < 24; h++) {
+          let s = 0;
+          for (let i = 0; i < 6; i++) s += hourCounts[(h + i) % 24];
+          if (s < minSum) { minSum = s; sleepStart = h; }
+        }
+        const sleepEnd = (sleepStart + 6) % 24;
+        const sleepWindow = `${padHour(sleepStart)} — ${padHour(sleepEnd)}`;
+
+        // Longest consecutive posting streak (calendar days)
+        const days = [...new Set(posts.map(p => p.createdAt.slice(0, 10)))].sort();
+        let streak = 1, cur = 1;
+        for (let i = 1; i < days.length; i++) {
+          const diff = (new Date(days[i]) - new Date(days[i - 1])) / 86400000;
+          cur = diff === 1 ? cur + 1 : 1;
+          if (cur > streak) streak = cur;
+        }
+
+        return { perDay, peakHour, lateNightPct, confessionHour, sleepWindow, streak };
+      }
+
+      function engagementStats(posts) {
+        if (!posts.length) return {};
+        const sorted = [...posts].sort((a, b) => b.likeCount - a.likeCount);
+        return { top: sorted[0], bottom: sorted[sorted.length - 1] };
+      }
+
+      function replyTargets(posts, didHandleMap) {
+        const freq = {};
+        let total = 0;
+        for (const p of posts) {
+          if (!p.replyParentUri) continue;
+          const did    = didFromUri(p.replyParentUri);
+          if (!did) continue;
+          const handle = didHandleMap[did] || did.slice(8, 22) + '…';
+          freq[handle] = (freq[handle] || 0) + 1;
+          total++;
+        }
+        return { targets: Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 6), total };
+      }
+
+      // ── Render ────────────────────────────────────────────
+      function renderProfile(p) {
+        const avatarEl = document.querySelector('#block01 .avatar');
+        if (p.avatar) {
+          const img = document.createElement('img');
+          img.src = p.avatar;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:5px;';
+          avatarEl.textContent = '';
+          avatarEl.appendChild(img);
+        } else {
+          avatarEl.textContent = (p.displayName || p.handle)[0].toUpperCase();
+        }
+        document.querySelector('#block01 .profile-info h3').textContent = p.displayName || p.handle;
+        document.querySelector('#block01 .profile-handle').textContent  = `@${p.handle} · joined ${fmtDate(p.createdAt)}`;
+        const nums = document.querySelectorAll('#block01 .stat-num');
+        nums[0].textContent = fmt(p.followersCount);
+        nums[1].textContent = fmt(p.followsCount);
+        nums[2].textContent = fmt(p.postsCount);
+        nums[3].textContent = p.followsCount ? fmt(Math.round(p.followersCount / p.followsCount)) + ':1' : '—';
+        document.querySelectorAll('#block01 .stat-label')[3].textContent = 'f/f ratio';
+      }
+
+      function renderPostingStats({ perDay, peakHour, lateNightPct, confessionHour, sleepWindow, streak }) {
+        const nums = document.querySelectorAll('#block02 .stat-num');
+        if (nums[0]) nums[0].textContent = perDay;
+        if (nums[1]) nums[1].textContent = padHour(confessionHour);
+        if (nums[2]) nums[2].textContent = padHour(peakHour);
+        if (nums[3]) nums[3].textContent = lateNightPct + '%';
+        const vals = document.querySelectorAll('#block02 .meta-metric-val');
+        if (vals[0]) vals[0].textContent = sleepWindow;
+        if (vals[1]) vals[1].textContent = streak + (streak === 1 ? ' day' : ' days');
+      }
+
+      let _activeDetailDay = null;
+
+      function renderDayDetail(dayIndex, dayName, grid) {
+        const detailEl = document.getElementById('hm-detail');
+        // Toggle off if same day clicked again
+        if (_activeDetailDay === dayIndex) {
+          _activeDetailDay = null;
+          detailEl.classList.remove('active');
+          document.querySelectorAll('.hm-day').forEach(el => el.classList.remove('hm-day-active'));
+          return;
+        }
+        _activeDetailDay = dayIndex;
+        document.querySelectorAll('.hm-day').forEach((el, i) =>
+          el.classList.toggle('hm-day-active', i === dayIndex)
+        );
+
+        const counts  = grid[dayIndex];
+        const total   = counts.reduce((a, b) => a + b, 0);
+        const maxVal  = Math.max(...counts, 1);
+        const peakH   = counts.indexOf(Math.max(...counts));
+
+        // SVG bar chart: 24 bars across full width
+        const W = 720, H = 80, barW = W / 24, pad = 1.5;
+        const bars = counts.map((n, h) => {
+          const bh    = Math.max(n > 0 ? 3 : 0, Math.round(n / maxVal * (H - 14)));
+          const x     = h * barW + pad;
+          const y     = H - bh - 12;
+          const alpha = n === 0 ? 0 : 0.2 + 0.8 * (n / maxVal);
+          const fill  = n === 0 ? '#1e1e2e' : `rgba(200,240,80,${alpha.toFixed(2)})`;
+          return `<g>
+            <rect x="${x.toFixed(1)}" y="${y}" width="${(barW - pad * 2).toFixed(1)}" height="${bh}" fill="${fill}" rx="1"/>
+            <text x="${(x + (barW - pad * 2) / 2).toFixed(1)}" y="${H - 1}" fill="#4a4a6a" font-family="DM Mono" font-size="6" text-anchor="middle">${h.toString().padStart(2,'0')}</text>
+            <title>${h.toString().padStart(2,'0')}:00 · ${n} post${n !== 1 ? 's' : ''}</title>
+          </g>`;
+        }).join('');
+
+        detailEl.innerHTML = `
+          <div class="hm-detail-head">
+            <span>${dayName} · hourly breakdown · ${DAYS}d aggregate</span>
+            <span class="hm-detail-close" id="hm-detail-close">✕ close</span>
+          </div>
+          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:80px;display:block;">${bars}</svg>
+          <div class="hm-detail-foot">
+            <span>peak · ${peakH.toString().padStart(2,'0')}:00 · ${counts[peakH]} posts</span>
+            <span>total · ${total} posts this day-of-week across ${DAYS}d</span>
+          </div>`;
+
+        document.getElementById('hm-detail-close').addEventListener('click', () => {
+          _activeDetailDay = null;
+          detailEl.classList.remove('active');
+          document.querySelectorAll('.hm-day').forEach(el => el.classList.remove('hm-day-active'));
+        });
+
+        detailEl.classList.add('active');
+      }
+
+      function renderHeatmap(grid) {
+        const hm     = document.getElementById('heatmap');
+        hm.innerHTML = '';
+        // Close any open detail panel when the heatmap is rebuilt (new scan)
+        _activeDetailDay = null;
+        const detail = document.getElementById('hm-detail');
+        if (detail) { detail.classList.remove('active'); detail.innerHTML = ''; }
+
+        const days   = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+        const colors = ['#1a1a28', '#2a3a1a', '#4a6a20', '#7aa830', '#c8f050'];
+        const maxVal = Math.max(...grid.flat(), 1);
+        hm.appendChild(document.createElement('div'));
+        for (let h = 0; h < 24; h++) {
+          const el = document.createElement('div');
+          el.className = 'hm-hour';
+          el.textContent = h.toString().padStart(2, '0');
+          hm.appendChild(el);
+        }
+        for (let d = 0; d < 7; d++) {
+          const label = document.createElement('div');
+          label.className = 'hm-day';
+          label.textContent = days[d];
+          label.title = `click to expand ${days[d]}`;
+          label.addEventListener('click', () => renderDayDetail(d, days[d], grid));
+          hm.appendChild(label);
+          for (let h = 0; h < 24; h++) {
+            const cell = document.createElement('div');
+            cell.className = 'hm-cell';
+            const val  = grid[d][h];
+            const tier = val === 0 ? 0 : Math.max(1, Math.min(Math.ceil(val / maxVal * (colors.length - 1)), colors.length - 1));
+            cell.style.background = colors[tier];
+            cell.title = `${days[d]} ${h}:00 · ${val} posts`;
+            hm.appendChild(cell);
+          }
+        }
+      }
+
+      function renderVocab(words) {
+        document.querySelector('#block06 .vocab-list').innerHTML = words
+          .map(([w, n]) => `<div class="vocab-row"><div class="vocab-word">${w}</div><span class="vocab-count">${n}×</span></div>`)
+          .join('');
+      }
+
+      function renderEngagement({ top, bottom }) {
+        const cards = document.querySelectorAll('#block07 .engage-card');
+        if (top && cards[0]) {
+          cards[0].querySelector('.engage-post').textContent = `"${top.text.slice(0, 180)}"`;
+          cards[0].querySelector('.engage-meta').innerHTML   = `<span>♥ ${fmt(top.likeCount)}</span><span>↻ ${fmt(top.repostCount)}</span><span>${fmtShortDate(top.createdAt)}</span>`;
+        }
+        if (bottom && cards[1]) {
+          cards[1].querySelector('.engage-post').textContent = `"${bottom.text.slice(0, 180)}"`;
+          cards[1].querySelector('.engage-meta').innerHTML   = `<span>♥ ${bottom.likeCount}</span><span>↻ ${bottom.repostCount}</span><span>${fmtShortDate(bottom.createdAt)}</span>`;
+        }
+      }
+
+      function renderInteractionWeb({ targets, total }) {
+        if (!targets.length) return;
+        const list     = document.querySelector('#block09 .web-list');
+        const maxCount = targets[0][1];
+        list.innerHTML = targets.map(([handle, count], i) => {
+          const pct     = Math.round(count / maxCount * 100);
+          const flagged = i === 0 && count / total > 0.3 ? 'flagged' : '';
+          return `<div class="web-row ${flagged}">
+            <span class="web-rank">${String(i + 1).padStart(2, '0')}</span>
+            <span class="web-handle">@${handle}</span>
+            <div class="web-bar" style="--pct:${pct}%"></div>
+            <span class="web-count">${count}</span>
+          </div>`;
+        }).join('');
+        const flagEl = document.getElementById('reply-flag');
+        if (flagEl) {
+          const topPct = total > 0 ? Math.round(targets[0][1] / total * 100) : 0;
+          if (topPct > 30) {
+            flagEl.style.display = '';
+            flagEl.textContent   = `⚠ FLAG · ${topPct}% of all replies directed at one (1) account. investigate parasocial entanglement.`;
+          } else {
+            flagEl.style.display = 'none';
+          }
+        }
+      }
+
+      // ── Seed heatmap with mock data on first load ──────────
+      (function seedHeatmap() {
+        const grid = Array.from({ length: 7 }, () => new Array(24).fill(0));
+        let seed = 42;
+        const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        for (let d = 0; d < 7; d++) for (let h = 0; h < 24; h++) {
+          let v = rand() * 0.3;
+          if (h >= 20 || h <= 3) v += rand() * 0.7;
+          if (h >= 4  && h <= 9) v *= 0.2;
+          if (d >= 5) v *= 1.2;
+          grid[d][h] = Math.round(Math.min(1, v) * 40);
+        }
+        renderHeatmap(grid);
+      })();
+
+      // ── Main orchestration ─────────────────────────────────
+      async function runDiagnostic(e) {
+        e.preventDefault();
+        const handle = input.value.trim().replace(/^@/, '');
+        if (!handle) return;
+
+        try {
+          // 1. AppView profile → DID + social counts
+          setStatus('resolving profile…');
+          const profile = await getProfile(handle);
+          renderProfile(profile);
+
+          // 2. DID document → PDS endpoint
+          setStatus(`resolving PDS for ${profile.did}…`);
+          const pds     = await resolvePds(profile.did);
+          const pdsHost = new URL(pds).hostname;
+
+          // 3. PDS post records + AppView engagement counts (parallel)
+          setStatus(`PDS: ${pdsHost} · streaming records…`);
+          const [pdsRecords, engagementMap] = await Promise.all([
+            listPdsPosts(pds, profile.did),
+            getEngagementMap(profile.handle),
+          ]);
+
+          if (!pdsRecords.length) { setStatus('no posts found in the last 90 days'); return; }
+
+          // 4. Normalise into flat post objects
+          const posts = normalisePosts(pdsRecords, engagementMap);
+
+          // 5. Resolve top reply-target DIDs → handles via AppView getProfiles.
+          // Count DID frequencies first so we resolve the most-replied-to
+          // accounts rather than the first 25 in post order.
+          const didFreq = {};
+          for (const p of posts) {
+            if (!p.replyParentUri) continue;
+            const did = didFromUri(p.replyParentUri);
+            if (did) didFreq[did] = (didFreq[did] || 0) + 1;
+          }
+          const topDids = Object.entries(didFreq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 25)
+            .map(([did]) => did);
+
+          setStatus(`resolving ${topDids.length} reply targets…`);
+          const didHandleMap = await resolveDidHandles(topDids);
+
+          // 6. Render all blocks
+          renderHeatmap(buildHeatgrid(posts));
+          renderVocab(topWords(posts));
+          renderPostingStats(postingStats(posts));
+          renderEngagement(engagementStats(posts));
+          renderInteractionWeb(replyTargets(posts, didHandleMap));
+
+          setStatus(`scan complete · ${posts.length} posts · PDS: ${pdsHost} · ${DAYS}d window`);
+        } catch (err) {
+          setStatus(`error · ${err.message}`);
+        }
+      }
+
+      form.addEventListener('submit', runDiagnostic);
+
+    })();
+  </script>
+
+</body>
+
+</html>
