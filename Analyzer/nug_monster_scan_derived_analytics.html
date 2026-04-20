@@ -1,0 +1,161 @@
+<div style="padding: 1rem 0;">
+
+<div style="display: flex; align-items: center; gap: 16px; padding: 1rem 1.25rem; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 1rem;">
+  <div style="width: 52px; height: 52px; border-radius: 50%; background: #7F77DD; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 18px; color: white;">KM</div>
+  <div style="flex: 1; min-width: 0;">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <p style="font-weight: 500; font-size: 15px; margin: 0;">Kieran ☑ · @nug.monster</p>
+      <span style="background: #EEEDFE; color: #3C3489; font-size: 11px; padding: 2px 8px; border-radius: 999px;">what the scan actually contains</span>
+    </div>
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 2px 0 0;">61,871 posts · 2,489 followers · joined Sep 2023 · Aotearoa</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1rem;">
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Posts in scan</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0;">61,871</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">36% original · 64% replies</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Peak month</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0;">3,400</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">Apr 2025 · ~113/day</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Sentiment mix</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0;">−0.06</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">avg compound, 21.9k scored</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Avg post length</p>
+    <p style="font-size: 22px; font-weight: 500; margin: 0;">101</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">characters</p>
+  </div>
+</div>
+
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem;">
+  <p style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">Posts per month</p>
+  <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 12px;">Peaked early 2025, settled into a lower rhythm through 2026</p>
+  <div style="position: relative; width: 100%; height: 180px;">
+    <canvas id="monthChart" role="img" aria-label="Monthly post volume, trending down from 3400 in April 2025 to around 1500 in 2026">Monthly post counts</canvas>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <p style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">Circadian rhythm</p>
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 12px;">Posts by hour of day (UTC → NZT +12)</p>
+    <div style="position: relative; width: 100%; height: 200px;">
+      <canvas id="hourChart" role="img" aria-label="Bar chart of posts by hour of day showing dual peaks">Hourly distribution</canvas>
+    </div>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 8px 0 0; line-height: 1.5;">Quiet window ~9pm–1am NZT (9–13 UTC). Mostly posts noon–mid-morning NZT.</p>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+    <p style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">Sentiment split</p>
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 12px;">Of 21,947 posts VADER scored</p>
+    <div style="display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 10px;">
+      <div style="width: 42.6%; background: #E24B4A;" title="Negative 42.6%"></div>
+      <div style="width: 22.0%; background: #B4B2A9;" title="Neutral 22.0%"></div>
+      <div style="width: 35.4%; background: #1D9E75;" title="Positive 35.4%"></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+      <div style="display: flex; justify-content: space-between;"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #E24B4A; border-radius: 2px;"></span>Negative</span><span>9,346 · 42.6%</span></div>
+      <div style="display: flex; justify-content: space-between;"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #B4B2A9; border-radius: 2px;"></span>Neutral</span><span>4,832 · 22.0%</span></div>
+      <div style="display: flex; justify-content: space-between;"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #1D9E75; border-radius: 2px;"></span>Positive</span><span>7,769 · 35.4%</span></div>
+    </div>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 10px 0 0; line-height: 1.5;">VADER flags frequent profanity as negative — read as "intensity" more than literal negativity.</p>
+  </div>
+</div>
+
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem;">
+  <p style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">Conversation circle</p>
+  <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 14px;">Top reply targets (resolved via didHandleMap)</p>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span style="color: var(--color-text-primary);">self (threads/quotes)</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 100%; height: 100%; background: #7F77DD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">5,161</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span>gloomcookie</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 33%; height: 100%; background: #378ADD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">1,706</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span>foxylustygrover</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 23%; height: 100%; background: #378ADD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">1,171</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span>dallasbarnett.com</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 20%; height: 100%; background: #378ADD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">1,038</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span>tess.bzky.team</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 8%; height: 100%; background: #378ADD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">412</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span>dimsie</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 6%; height: 100%; background: #378ADD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">302</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 200px 1fr 60px; gap: 12px; align-items: center; font-size: 13px;">
+      <span>oracularhades.com</span>
+      <div style="height: 10px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;"><div style="width: 6%; height: 100%; background: #378ADD;"></div></div>
+      <span style="color: var(--color-text-secondary); text-align: right;">296</span>
+    </div>
+  </div>
+  <p style="font-size: 11px; color: var(--color-text-secondary); margin: 12px 0 0; line-height: 1.5;">Roughly 8% of replies are self-threads — the rest cluster heavily around a small core of ~6 accounts.</p>
+</div>
+
+<div style="background: var(--color-background-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+  <p style="font-size: 13px; font-weight: 500; color: var(--color-text-info); margin: 0 0 8px;">Want to dig deeper?</p>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <button onclick="sendPrompt('Build a reply-network graph from the scan showing clusters')">Map the conversation network ↗</button>
+    <button onclick="sendPrompt('Analyze topic drift over time from the post text')">Topic drift over time ↗</button>
+    <button onclick="sendPrompt('Find posts with unusually high engagement vs the baseline')">Find outlier posts ↗</button>
+    <button onclick="sendPrompt('Generate a language fingerprint — favorite phrases and bigrams')">Language fingerprint ↗</button>
+    <button onclick="sendPrompt('Build a thread reconstruction from replyParentUri chains')">Reconstruct threads ↗</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('monthChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Nov 24','Dec 24','Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26'],
+    datasets: [{ data: [2271,2867,2538,3362,3186,3400,2034,2026,1555,1232,1639,2459,1255,1545,1732,1475,1426,1505], backgroundColor: '#378ADD', borderRadius: 3 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => c.parsed.y.toLocaleString() + ' posts' } } },
+    scales: {
+      x: { ticks: { font: {size: 10}, maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+      y: { ticks: { font: {size: 10}, callback: (v) => (v/1000).toFixed(1) + 'k' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+    }
+  }
+});
+
+const hourData = [3969,3703,3431,3583,4075,4197,4062,3132,1837,619,268,204,312,421,764,912,1347,1883,2663,3801,4294,4221,4161,4011];
+new Chart(document.getElementById('hourChart'), {
+  type: 'bar',
+  data: {
+    labels: hourData.map((_,i) => i),
+    datasets: [{ data: hourData, backgroundColor: hourData.map(v => v < 1000 ? '#B5D4F4' : '#378ADD'), borderRadius: 2 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { title: (c) => c[0].label + ':00 UTC', label: (c) => c.parsed.y.toLocaleString() + ' posts' } } },
+    scales: {
+      x: { ticks: { font: {size: 9}, autoSkip: false, maxRotation: 0, callback: function(v,i) { return i % 3 === 0 ? i : ''; } }, grid: { display: false }, title: { display: true, text: 'hour UTC', font: {size: 10}, color: '#888780' } },
+      y: { ticks: { font: {size: 9}, callback: (v) => (v/1000).toFixed(0) + 'k' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+    }
+  }
+});
+</script>
+</div>

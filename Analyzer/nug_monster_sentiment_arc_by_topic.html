@@ -1,0 +1,183 @@
+<div style="padding: 1rem 0;">
+
+<div style="margin-bottom: 1rem;">
+  <p style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">Sentiment arc, overlaid on topic trends</p>
+  <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0; line-height: 1.5;">Monthly average VADER compound score. Negative = heavy/angry register, positive = lighter. Click a topic to overlay its arc on the main chart.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1rem;">
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Darkest month</p>
+    <p style="font-size: 18px; font-weight: 500; margin: 0;">Feb 2026</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">avg −0.130 · 1,475 posts</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Lightest month</p>
+    <p style="font-size: 18px; font-weight: 500; margin: 0;">Apr 2026</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">avg +0.001 · 1,505 posts</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+    <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Always negative</p>
+    <p style="font-size: 18px; font-weight: 500; margin: 0;">Trump, Social</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0;">never crosses zero</p>
+  </div>
+</div>
+
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <p style="font-size: 14px; font-weight: 500; margin: 0;">Monthly sentiment — <span id="overlay-label" style="color: var(--color-text-secondary); font-weight: 400;">overall</span></p>
+    <button onclick="clearOverlay()" id="clear-btn" style="display: none; font-size: 12px;">Clear overlay ×</button>
+  </div>
+  <div style="position: relative; width: 100%; height: 280px;">
+    <canvas id="mainChart" role="img" aria-label="Monthly sentiment line chart">Monthly sentiment</canvas>
+  </div>
+</div>
+
+<p style="font-size: 13px; color: var(--color-text-secondary); margin: 1rem 0 10px; font-weight: 500;">Per-topic arcs · click to overlay</p>
+<div id="topic-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 1rem;"></div>
+
+<div style="background: var(--color-background-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+  <p style="font-size: 13px; font-weight: 500; color: var(--color-text-info); margin: 0 0 8px;">Dig further</p>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <button onclick="sendPrompt('What was happening in February 2026 that made it the darkest month — show me the most negative posts from that month')">What happened Feb 2026 ↗</button>
+    <button onclick="sendPrompt('Why is Life stuff the only consistently positive topic — sample posts that score high')">Why is Life stuff positive ↗</button>
+    <button onclick="sendPrompt('Compare sentiment on days nug.monster replies to gloomcookie vs days they dont')">Sentiment by reply partner ↗</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const MONTHS = ["Nov '24","Dec '24","Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"];
+const OVERALL = [-0.056,-0.002,-0.023,-0.077,-0.058,-0.105,-0.088,-0.082,-0.073,-0.09,-0.043,-0.054,-0.062,-0.092,-0.055,-0.13,-0.021,0.001];
+const TOPIC_ARCS = {"Cultural takes":[-0.006,-0.034,0.075,-0.082,-0.099,-0.161,-0.269,-0.093,-0.053,-0.232,0.014,-0.086,0.012,-0.323,-0.147,-0.072,0.089,0.039],"Media & music":[-0.005,0.113,0.106,-0.058,-0.03,-0.013,-0.078,-0.075,-0.117,-0.106,0.023,-0.032,-0.096,0.052,-0.145,-0.048,0.055,0.125],"News reactions":[0.012,-0.053,-0.08,-0.06,-0.164,-0.166,-0.112,-0.224,-0.057,0.017,0.043,-0.039,-0.151,-0.086,0.138,-0.19,-0.132,0.015],"Memory & reflection":[-0.071,0.068,-0.123,-0.132,-0.035,-0.181,-0.161,-0.125,-0.028,-0.08,-0.064,0.018,-0.119,-0.079,0.041,-0.185,-0.068,-0.039],"Life stuff":[-0.035,0.197,0.038,0.017,0.101,-0.081,-0.053,0.003,-0.12,0.146,0.104,-0.032,0.046,0.051,-0.042,0.083,-0.062,0.126],"NZ politics":[-0.001,0.001,0.07,-0.169,-0.097,-0.037,0.058,-0.106,-0.027,-0.143,-0.123,-0.03,-0.01,-0.255,-0.075,-0.105,-0.008,0.04],"Internet & news":[-0.165,-0.005,0.111,-0.139,-0.118,-0.169,-0.129,-0.108,-0.08,-0.194,null,-0.138,-0.185,-0.297,-0.046,-0.154,-0.016,-0.034],"Trump / US politics":[-0.202,-0.035,-0.136,-0.229,-0.124,-0.143,-0.231,-0.254,-0.261,-0.161,-0.282,-0.183,-0.109,-0.206,-0.207,-0.237,-0.184,-0.131],"Social issues":[-0.169,-0.245,-0.132,-0.178,-0.014,-0.148,-0.117,-0.241,-0.152,-0.223,-0.206,-0.207,-0.193,-0.111,-0.139,-0.214,-0.054,-0.235],"Daily life":[0.043,-0.046,-0.124,-0.043,-0.123,-0.123,0.026,0.025,0.005,-0.152,0.046,0.029,-0.059,-0.066,-0.06,-0.036,0.037,0.045]};
+
+const TOPIC_ORDER = ["Daily life","Memory & reflection","Trump / US politics","Media & music","Social issues","Life stuff","News reactions","Cultural takes","NZ politics","Internet & news"];
+const COLORS = {"Daily life":"#378ADD","Memory & reflection":"#7F77DD","Trump / US politics":"#E24B4A","Media & music":"#1D9E75","Social issues":"#D4537E","Life stuff":"#BA7517","News reactions":"#185FA5","Cultural takes":"#D85A30","NZ politics":"#534AB7","Internet & news":"#888780"};
+
+let mainChart;
+const ctx = document.getElementById('mainChart');
+
+function buildChart(overlayName) {
+  if (mainChart) mainChart.destroy();
+  const datasets = [
+    {
+      label: 'Overall',
+      data: OVERALL,
+      borderColor: '#444441',
+      backgroundColor: 'rgba(68,68,65,0.08)',
+      borderWidth: 2,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: '#444441',
+      fill: true,
+      order: 2,
+    }
+  ];
+  if (overlayName) {
+    datasets.unshift({
+      label: overlayName,
+      data: TOPIC_ARCS[overlayName],
+      borderColor: COLORS[overlayName],
+      backgroundColor: 'transparent',
+      borderWidth: 2.5,
+      borderDash: [6, 3],
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: COLORS[overlayName],
+      spanGaps: true,
+      order: 1,
+    });
+  }
+  mainChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: MONTHS, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (c) => c.dataset.label + ': ' + (c.parsed.y !== null ? (c.parsed.y >= 0 ? '+' : '') + c.parsed.y.toFixed(3) : 'n/a')
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: {size: 10}, maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+        y: {
+          min: -0.35, max: 0.25,
+          ticks: { font: {size: 10}, callback: (v) => v >= 0 ? '+' + v.toFixed(2) : v.toFixed(2) },
+          grid: { color: (c) => c.tick.value === 0 ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.05)', lineWidth: (c) => c.tick.value === 0 ? 1 : 1 }
+        }
+      }
+    }
+  });
+}
+
+buildChart(null);
+
+function overlay(name) {
+  document.getElementById('overlay-label').textContent = 'overall + ' + name;
+  document.getElementById('clear-btn').style.display = 'inline-block';
+  buildChart(name);
+  document.querySelectorAll('.topic-card').forEach(el => {
+    el.style.borderColor = el.dataset.name === name ? COLORS[name] : 'var(--color-border-tertiary)';
+    el.style.borderWidth = el.dataset.name === name ? '1px' : '0.5px';
+  });
+}
+
+function clearOverlay() {
+  document.getElementById('overlay-label').textContent = 'overall';
+  document.getElementById('clear-btn').style.display = 'none';
+  buildChart(null);
+  document.querySelectorAll('.topic-card').forEach(el => {
+    el.style.borderColor = 'var(--color-border-tertiary)';
+    el.style.borderWidth = '0.5px';
+  });
+}
+
+function sparkPath(series, w, h) {
+  const clean = series.map(v => v === null ? null : v);
+  const nums = clean.filter(v => v !== null);
+  const min = -0.35, max = 0.2;
+  const range = max - min;
+  let d = '';
+  let started = false;
+  clean.forEach((v, i) => {
+    if (v === null) { started = false; return; }
+    const x = (i / (series.length - 1)) * w;
+    const y = h - ((v - min) / range) * h;
+    d += (started ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+    started = true;
+  });
+  return d;
+}
+
+const grid = document.getElementById('topic-grid');
+grid.innerHTML = TOPIC_ORDER.map(name => {
+  const arc = TOPIC_ARCS[name];
+  const vals = arc.filter(v => v !== null);
+  const avg = vals.reduce((a,b)=>a+b,0) / vals.length;
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const w = 180, h = 36;
+  const zeroY = h - ((0 - (-0.35)) / 0.55) * h;
+  return '<div class="topic-card" data-name="' + name + '" onclick="overlay(\'' + name + '\')" style="cursor: pointer; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; transition: all 0.15s;">' +
+    '<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px;">' +
+      '<div style="display: flex; align-items: center; gap: 8px; min-width: 0;">' +
+        '<span style="width: 8px; height: 8px; border-radius: 2px; background: ' + COLORS[name] + '; flex-shrink: 0;"></span>' +
+        '<p style="font-size: 13px; font-weight: 500; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + name + '</p>' +
+      '</div>' +
+      '<span style="font-size: 11px; color: var(--color-text-secondary); white-space: nowrap;">avg ' + (avg>=0?'+':'') + avg.toFixed(2) + '</span>' +
+    '</div>' +
+    '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" height="' + h + '" preserveAspectRatio="none">' +
+      '<line x1="0" y1="' + zeroY.toFixed(1) + '" x2="' + w + '" y2="' + zeroY.toFixed(1) + '" stroke="rgba(0,0,0,0.15)" stroke-width="0.5" stroke-dasharray="2,2"/>' +
+      '<path d="' + sparkPath(arc, w, h) + '" fill="none" stroke="' + COLORS[name] + '" stroke-width="1.5"/>' +
+    '</svg>' +
+    '<div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-secondary); margin-top: 2px;">' +
+      '<span>min ' + (min>=0?'+':'') + min.toFixed(2) + '</span>' +
+      '<span>max ' + (max>=0?'+':'') + max.toFixed(2) + '</span>' +
+    '</div>' +
+  '</div>';
+}).join('');
+</script>
+</div>

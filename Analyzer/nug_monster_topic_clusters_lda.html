@@ -1,0 +1,116 @@
+<div style="padding: 1rem 0;">
+
+<div style="margin-bottom: 1rem;">
+  <p style="font-size: 15px; font-weight: 500; margin: 0 0 4px;">Topic model — 10 themes across 46,964 substantive posts</p>
+  <p style="font-size: 12px; color: var(--color-text-secondary); margin: 0; line-height: 1.5;">Fitted with Latent Dirichlet Allocation on post text. 8,999 posts (19%) were too mixed to assign a primary topic. Click a topic to see representative posts.</p>
+</div>
+
+<div id="topic-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1rem;"></div>
+
+<div id="detail" style="display: none; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem;"></div>
+
+<div style="background: var(--color-background-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem;">
+  <p style="font-size: 13px; font-weight: 500; color: var(--color-text-info); margin: 0 0 8px;">Explore further</p>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <button onclick="sendPrompt('Plot sentiment arc over time, overlaid on the topic trends')">Sentiment arc over time ↗</button>
+    <button onclick="sendPrompt('Show which topics they mostly talk about with each of their top 5 reply partners')">Topics by conversation partner ↗</button>
+    <button onclick="sendPrompt('Find posts that are unusually long compared to their norm — what gets them to actually write a lot?')">What triggers long posts ↗</button>
+  </div>
+</div>
+
+<script>
+const TOPICS = [{"label": "Daily life", "sublabel": "day/night, house, morning, routine", "size": 5272, "pct": 11.2, "terms": ["day", "night", "might", "house", "morning", "hours", "last", "start"], "examples": ["With the massive winds expected tonight fellow kiwis, don't forget to close windows. An open window letting high speed wind in can be how you lose a window, or a roof.", "i hate to break it to you but it's lunchtime tomorrow not early morning. so now you have to spend several hours at work on the last day."], "avgCompound": -0.013, "replyPct": 56.9, "spark": [0.1562, 0.1623, 0.1347, 0.1298, 0.1375, 0.1401, 0.1335, 0.1262, 0.1323, 0.1376, 0.1416, 0.129, 0.1434, 0.1691, 0.1414, 0.1399, 0.127, 0.1477]}, {"label": "Memory & reflection", "sublabel": "years ago, reminiscing", "size": 4322, "pct": 9.2, "terms": ["years", "year", "ago", "absolutely", "days", "sure", "brain", "time"], "examples": ["Sure, a well aimed solar storm *today* would be devastating to modern society, but scitechdaily, a solar storm 13,000 years ago will do nothing to money technology, and won't cost us anything.", "you know i've watched ad astra like 4 or 5 times when i'm high because i like space movies with good special effects and i still have absolutely no fucking idea what it's about"], "avgCompound": -0.053, "replyPct": 64.7, "spark": [0.1127, 0.1098, 0.1236, 0.0986, 0.1132, 0.1052, 0.0986, 0.1227, 0.1043, 0.1073, 0.1242, 0.1161, 0.0866, 0.1221, 0.1128, 0.0958, 0.1196, 0.1184]}, {"label": "Trump / US politics", "sublabel": "stupid, vote, idiot, call", "size": 4263, "pct": 9.1, "terms": ["stupid", "trump", "dumb", "real", "call", "job", "idiot", "literally"], "examples": ["Fun fact about Andy ogles is that he ran a gofundme for a fake dead baby memorial that didn't exist. Literally made up a dead baby to steal money", "it's pretty clear that the votes went to greens and TPM. which means labour lost progressive voters, not centrist voters and dipshit undecideds."], "avgCompound": -0.17, "replyPct": 63.0, "spark": [0.115, 0.0994, 0.1112, 0.1273, 0.1267, 0.1247, 0.1246, 0.0924, 0.1087, 0.1169, 0.1242, 0.1045, 0.1028, 0.1033, 0.11, 0.1184, 0.1058, 0.1212]}, {"label": "Media & music", "sublabel": "movies, YouTube, songs, NZ", "size": 4111, "pct": 8.8, "terms": ["new", "watch", "new zealand", "zealand", "video", "song", "movie", "music"], "examples": ["i usually give horror movies a lot of leeway for terrible fuckin' acting but i'm less than 3 minutes into this movie and i'm already impressed by the acting of the dog.", "yesterday one of the videos was 3 hour metal gear solid vent ambience and it was literally a 3 hour video of solid snake looking out of a vent with occasional radio chatter"], "avgCompound": -0.01, "replyPct": 57.9, "spark": [0.1231, 0.1109, 0.123, 0.1016, 0.1111, 0.1057, 0.1084, 0.1209, 0.0987, 0.0839, 0.1068, 0.091, 0.1177, 0.0887, 0.11, 0.098, 0.1312, 0.1032]}, {"label": "Social issues", "sublabel": "women, kids, family, violence", "size": 3981, "pct": 8.5, "terms": ["media", "women", "country", "kids", "minister", "kill", "believe", "killed"], "examples": ["yeah my whole family goes in on a cow 'cause brother's in-laws are dairy farmers. So we all get a quarter.", "en.wikipedia.org/wiki/Diphallia i'm warning you now do NOT click on the link but men can indeed have two penises."], "avgCompound": -0.144, "replyPct": 68.2, "spark": [0.0796, 0.0988, 0.0916, 0.1122, 0.103, 0.0945, 0.1048, 0.1173, 0.1054, 0.1142, 0.1078, 0.1127, 0.092, 0.1138, 0.1072, 0.0958, 0.0921, 0.089]}, {"label": "Life stuff", "sublabel": "weed, week, personal routine", "size": 3313, "pct": 7.1, "terms": ["week", "big", "best", "weed", "since", "ones", "car", "shitty"], "examples": ["i've got a weed prescription but i also really like just smoking weed so i tend to run through it pretty quick. gotta wait til next week now", "lol rand paul claiming he was the victim of political violence but his neighbour kicked his ass because paul had been dumping shit in his yard."], "avgCompound": 0.025, "replyPct": 67.4, "spark": [0.0774, 0.0924, 0.0811, 0.082, 0.0782, 0.0893, 0.0717, 0.0853, 0.0897, 0.1018, 0.0817, 0.0835, 0.0961, 0.0772, 0.0804, 0.0904, 0.1069, 0.0786]}, {"label": "News reactions", "sublabel": "politics, current events", "size": 3211, "pct": 6.8, "terms": ["today", "wonder", "seen", "far", "hamilton", "yet", "drive", "hard"], "examples": ["The fact that they won't put a name to this means Claire is perfectly well aware that applauding the government's making poor people homeless really fast won't go down well.", "idk the fact that a bigger, more resourced country like australia has the PM interrupting ALL broadcasts to make an address and ours is like nah"], "avgCompound": -0.062, "replyPct": 61.2, "spark": [0.0921, 0.0867, 0.0661, 0.088, 0.0868, 0.0816, 0.078, 0.0809, 0.102, 0.0853, 0.073, 0.0781, 0.0988, 0.0929, 0.0795, 0.0947, 0.0836, 0.0909]}, {"label": "Cultural takes", "sublabel": "food, places, everyday critique", "size": 3195, "pct": 6.8, "terms": ["right", "old", "place", "food", "well", "without", "absolutely", "unless"], "examples": ["In other cultures it's considered gratitude to the chef to slurp and smack your food. Cool. Here it's considered rude to eat with your mouth open", "idk if search results all show up the same, but if they do, my posts about how much she sucks show up first. curious that he's not quote-posting me, the guy."], "avgCompound": -0.088, "replyPct": 67.5, "spark": [0.0766, 0.0872, 0.0785, 0.0875, 0.09, 0.0929, 0.0986, 0.0836, 0.0673, 0.0935, 0.0861, 0.0896, 0.0866, 0.0825, 0.0813, 0.0807, 0.0794, 0.0843]}, {"label": "NZ politics", "sublabel": "Seymour, ACT, Musk, Twitter", "size": 3160, "pct": 6.7, "terms": ["stop", "cheese", "seymour", "post", "david", "musk", "act", "change"], "examples": ["sorry I meant to say Close Personal Friend of David Seymour and former Act Party President Tim Jago", "today apparently a lot of people are getting banned from twitter for asking grok to generate images of elon musk endorsing elon musk's assassination"], "avgCompound": -0.041, "replyPct": 61.1, "spark": [0.0899, 0.0838, 0.104, 0.0921, 0.0771, 0.0806, 0.0914, 0.0924, 0.102, 0.0825, 0.085, 0.091, 0.088, 0.072, 0.0878, 0.085, 0.0667, 0.0814]}, {"label": "Internet & news", "sublabel": "reading, nazis, online discourse", "size": 3137, "pct": 6.7, "terms": ["time", "stuff", "first", "news", "love", "kinda", "read", "school"], "examples": ["I think the next time there's a hurricane in florida, we nuke mar-a-lago to see if it makes the hurricane dissipate.", "literally not true if you look at any long term trends. this is just loser date-rapists joining the pedo club their pedo president and VP endorses."]  , "avgCompound": -0.104, "replyPct": 62.4, "spark": [0.0774, 0.0687, 0.0863, 0.081, 0.0765, 0.0852, 0.0905, 0.0782, 0.0897, 0.077, 0.0697, 0.1045, 0.088, 0.0783, 0.0896, 0.1012, 0.0878, 0.0852]}];
+
+const MONTHS = ["Nov '24","Dec '24","Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"];
+
+const COLORS = ['#378ADD','#7F77DD','#E24B4A','#1D9E75','#D4537E','#BA7517','#185FA5','#D85A30','#534AB7','#888780'];
+
+function sparkPath(series, w=140, h=32) {
+  const max = Math.max(...series);
+  const min = Math.min(...series);
+  const range = max - min || 1;
+  return series.map((v,i) => {
+    const x = (i / (series.length - 1)) * w;
+    const y = h - ((v - min) / range) * h;
+    return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+}
+
+function sentimentLabel(c) {
+  if (c > 0) return { text: '+' + c.toFixed(2), color: '#0F6E56', bg: '#E1F5EE' };
+  if (c > -0.08) return { text: c.toFixed(2), color: '#5F5E5A', bg: '#F1EFE8' };
+  if (c > -0.13) return { text: c.toFixed(2), color: '#854F0B', bg: '#FAEEDA' };
+  return { text: c.toFixed(2), color: '#A32D2D', bg: '#FCEBEB' };
+}
+
+const grid = document.getElementById('topic-grid');
+grid.innerHTML = TOPICS.map((t, i) => {
+  const s = sentimentLabel(t.avgCompound);
+  const terms = t.terms.slice(0, 5).map(w => '<span style="font-size: 11px; padding: 2px 6px; background: var(--color-background-secondary); border-radius: 3px; color: var(--color-text-secondary);">' + w + '</span>').join(' ');
+  return '<div onclick="showDetail(' + i + ')" style="cursor: pointer; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 14px; transition: background 0.15s;" onmouseover="this.style.background=\'var(--color-background-secondary)\'" onmouseout="this.style.background=\'var(--color-background-primary)\'">' +
+    '<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">' +
+      '<div style="min-width: 0; flex: 1;">' +
+        '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">' +
+          '<span style="width: 8px; height: 8px; border-radius: 2px; background: ' + COLORS[i] + '; flex-shrink: 0;"></span>' +
+          '<p style="font-size: 14px; font-weight: 500; margin: 0;">' + t.label + '</p>' +
+        '</div>' +
+        '<p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 0 16px;">' + t.sublabel + '</p>' +
+      '</div>' +
+      '<svg viewBox="0 0 140 32" width="80" height="22" style="flex-shrink: 0;"><path d="' + sparkPath(t.spark) + '" fill="none" stroke="' + COLORS[i] + '" stroke-width="1.2"/></svg>' +
+    '</div>' +
+    '<div style="display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0 8px 16px;">' + terms + '</div>' +
+    '<div style="display: flex; gap: 12px; font-size: 11px; color: var(--color-text-secondary); margin-left: 16px;">' +
+      '<span>' + t.size.toLocaleString() + ' posts · ' + t.pct + '%</span>' +
+      '<span style="padding: 1px 6px; background: ' + s.bg + '; color: ' + s.color + '; border-radius: 3px;">sent ' + s.text + '</span>' +
+      '<span>' + t.replyPct + '% replies</span>' +
+    '</div>' +
+  '</div>';
+}).join('');
+
+function showDetail(i) {
+  const t = TOPICS[i];
+  const s = sentimentLabel(t.avgCompound);
+  const w = 600, h = 80;
+  const max = Math.max(...t.spark);
+  const min = Math.min(...t.spark);
+  const range = max - min || 1;
+  const pts = t.spark.map((v, idx) => {
+    const x = (idx / (t.spark.length - 1)) * w;
+    const y = h - ((v - min) / range) * (h - 20) - 10;
+    return {x, y, v};
+  });
+  const linePath = pts.map((p, idx) => (idx === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const areaPath = linePath + ' L' + w + ',' + h + ' L0,' + h + ' Z';
+
+  const allTerms = t.terms.map(x => '<span style="font-size: 12px; padding: 3px 8px; background: var(--color-background-secondary); border-radius: 3px; color: var(--color-text-secondary); display: inline-block;">' + x + '</span>').join(' ');
+  const ex = t.examples.map(e => '<div style="background: var(--color-background-secondary); border-left: 3px solid ' + COLORS[i] + '; border-radius: 0; padding: 8px 12px; font-size: 13px; line-height: 1.5; margin-bottom: 6px;">' + e + '</div>').join('');
+
+  const d = document.getElementById('detail');
+  d.style.display = 'block';
+  d.innerHTML =
+    '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+      '<div><p style="font-size: 16px; font-weight: 500; margin: 0 0 2px;">' + t.label + '</p>' +
+      '<p style="font-size: 12px; color: var(--color-text-secondary); margin: 0;">' + t.size.toLocaleString() + ' posts · ' + t.pct + '% of corpus · avg sentiment ' + s.text + '</p></div>' +
+      '<button onclick="document.getElementById(\'detail\').style.display=\'none\'" style="font-size: 18px; line-height: 1; padding: 4px 10px;">×</button>' +
+    '</div>' +
+    '<p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Top terms</p>' +
+    '<div style="margin-bottom: 14px;">' + allTerms + '</div>' +
+    '<p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Monthly share</p>' +
+    '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" height="80" style="margin-bottom: 6px;">' +
+      '<path d="' + areaPath + '" fill="' + COLORS[i] + '" fill-opacity="0.12"/>' +
+      '<path d="' + linePath + '" fill="none" stroke="' + COLORS[i] + '" stroke-width="1.5"/>' +
+      pts.map(p => '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="2" fill="' + COLORS[i] + '"/>').join('') +
+    '</svg>' +
+    '<div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-secondary); margin-bottom: 14px;">' +
+      '<span>' + MONTHS[0] + '</span><span>' + MONTHS[Math.floor(MONTHS.length/2)] + '</span><span>' + MONTHS[MONTHS.length-1] + '</span>' +
+    '</div>' +
+    '<p style="font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px;">Representative posts</p>' +
+    ex +
+    '<div style="margin-top: 10px;">' +
+      '<button onclick="sendPrompt(\'Show me 10 more example posts from the ' + t.label + ' topic\')">See more posts ↗</button> ' +
+      '<button onclick="sendPrompt(\'Which reply partners does nug.monster discuss ' + t.label + ' with most?\')">Who do they discuss this with ↗</button>' +
+    '</div>';
+  d.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+</script>
+</div>
