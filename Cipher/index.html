@@ -4,21 +4,344 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Main</title>
+  <title>nug.monster — cipher</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    .cipher-panel {
+      margin-top: 2rem;
+      padding: 1.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cipher-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 80px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .field-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .cipher-panel textarea,
+    .cipher-panel input {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.75rem 0.9rem;
+      resize: vertical;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+
+    .cipher-panel textarea {
+      min-height: 120px;
+      line-height: 1.5;
+    }
+
+    .cipher-panel textarea:focus,
+    .cipher-panel input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 0 16px var(--card-glow);
+    }
+
+    .cipher-panel textarea::placeholder,
+    .cipher-panel input::placeholder {
+      color: var(--muted);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .cipher-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.1rem;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.1s;
+    }
+
+    .cipher-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--card-glow);
+    }
+
+    .cipher-btn.primary {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .cipher-btn.primary:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .cipher-btn.secondary:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .cipher-btn:active {
+      transform: translateY(1px);
+    }
+
+    .result-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.1rem;
+      min-height: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .result-prompt {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .result-mode {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #result {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+      word-break: break-all;
+      line-height: 1.6;
+      min-height: 1.4em;
+    }
+
+    #result.empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .copy-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.55rem;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .copy-btn:hover {
+      color: var(--accent2);
+      border-color: var(--accent2);
+    }
+
+    .cipher-note {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+
+    .cipher-note code {
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+    }
+  </style>
 </head>
-<nav class="breadcrumb">
-  <span class="breadcrumb-label">path</span>
-  <span class="breadcrumb-path">
-    / <a href="../index.html">index</a>
-    / <a href="../collection/index.html">cards</a>
-    / <a href="../about/index.html">about</a>
-    / <a href="../contact/index.html">contact</a>
-    / <strong>Cipher</strong>
-    / <a href="../main/index.html">main</a>
-    / <a href="../Analyzer/index.html">analyzer</a>
-  </span>
+
+<body>
+  <header>
+    <span class="site-label">nug.monster / cipher</span>
+    <h1>vigen&egrave;re<br><span>cipher</span></h1>
+    <p class="subtitle">a 16th-century polyalphabetic cipher — feed it text, give it a key, receive encoded signal.</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <span class="breadcrumb-label">path</span>
+    <span class="breadcrumb-path">
+      / <a href="../index.html">index</a>
+      / <a href="../collection/index.html">cards</a>
+      / <a href="../about/index.html">about</a>
+      / <a href="../contact/index.html">contact</a>
+      / <strong>cipher</strong>
+      / <a href="../main/index.html">main</a>
+      / <a href="../Analyzer/index.html">analyzer</a>
+    </span>
+  </nav>
+
+  <main class="page-content">
+    <div class="section-head">
+      <span class="section-title">transmission</span>
+      <span class="section-count">letters only · a&ndash;z</span>
+    </div>
+
+    <div class="cipher-panel">
+      <div class="field">
+        <label class="field-label" for="text">plaintext / ciphertext</label>
+        <textarea id="text" placeholder="enter text here..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="key">key</label>
+        <input id="key" placeholder="enter key...">
+      </div>
+
+      <div class="button-row">
+        <button class="cipher-btn primary" onclick="encrypt()">encrypt →</button>
+        <button class="cipher-btn secondary" onclick="decrypt()">← decrypt</button>
+        <button class="cipher-btn" onclick="clearAll()">clear</button>
+      </div>
+
+      <div class="result-block">
+        <div class="result-header">
+          <span class="result-prompt">&gt; output</span>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span class="result-mode" id="mode">awaiting</span>
+            <button class="copy-btn" onclick="copyResult()">copy</button>
+          </div>
+        </div>
+        <div id="result" class="empty">no signal yet — encrypt or decrypt to populate.</div>
+      </div>
+
+      <p class="cipher-note">
+        non-letters are stripped, case is normalised. the key repeats across the message.
+        try <code>HELLO WORLD</code> with key <code>KEY</code>.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <span><a href="https://nugmonster.com">nug.monster</a> &mdash; est. 2025</span>
+    <span><a href="../index.html">&larr; home</a></span>
+  </footer>
+
+  <script>
+    function format(text) {
+      return text.toUpperCase().replace(/[^A-Z]/g, "");
+    }
+
+    function vigenere(text, key, decrypt = false) {
+      text = format(text);
+      key = format(key);
+
+      if (!text || !key) return "";
+
+      let result = "";
+      let j = 0;
+
+      for (let i = 0; i < text.length; i++) {
+        let t = text.charCodeAt(i) - 65;
+        let k = key.charCodeAt(j % key.length) - 65;
+
+        let val = decrypt
+          ? (t - k + 26) % 26
+          : (t + k) % 26;
+
+        result += String.fromCharCode(val + 65);
+        j++;
+      }
+
+      return result;
+    }
+
+    function render(output, mode) {
+      const el = document.getElementById("result");
+      const modeEl = document.getElementById("mode");
+      if (!output) {
+        el.classList.add("empty");
+        el.innerText = "provide both text and a key to begin.";
+        modeEl.innerText = "awaiting";
+        return;
+      }
+      el.classList.remove("empty");
+      el.innerText = output;
+      modeEl.innerText = mode;
+    }
+
+    function encrypt() {
+      const text = document.getElementById("text").value;
+      const key = document.getElementById("key").value;
+      render(vigenere(text, key, false), "encrypted");
+    }
+
+    function decrypt() {
+      const text = document.getElementById("text").value;
+      const key = document.getElementById("key").value;
+      render(vigenere(text, key, true), "decrypted");
+    }
+
+    function clearAll() {
+      document.getElementById("text").value = "";
+      document.getElementById("key").value = "";
+      render("", "awaiting");
+      const el = document.getElementById("result");
+      el.classList.add("empty");
+      el.innerText = "no signal yet — encrypt or decrypt to populate.";
+    }
+
+    function copyResult() {
+      const el = document.getElementById("result");
+      if (el.classList.contains("empty")) return;
+      navigator.clipboard.writeText(el.innerText);
+      const modeEl = document.getElementById("mode");
+      const prev = modeEl.innerText;
+      modeEl.innerText = "copied";
+      setTimeout(() => { modeEl.innerText = prev; }, 1200);
+    }
+  </script>
+</body>
+
+</html>

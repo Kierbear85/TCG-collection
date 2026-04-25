@@ -10,7 +10,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Unbounded:wght@400;700;900&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../styles.css" />
   <style>
     /* ── Analyzer-specific ── */
     main.analyzer {
@@ -1129,6 +1129,16 @@
 
       function setStatus(msg) { statusText.textContent = msg; }
 
+      // Escape user/API-controlled strings before interpolating into innerHTML.
+      function esc(s) {
+        return String(s ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
       function fmt(n) {
         if (n == null) return '—';
         n = Number(n);
@@ -1649,7 +1659,7 @@
 
       function renderVocab(words) {
         document.querySelector('#block06 .vocab-list').innerHTML = words
-          .map(([w, n]) => `<div class="vocab-row"><div class="vocab-word">${w}</div><span class="vocab-count">${n}×</span></div>`)
+          .map(([w, n]) => `<div class="vocab-row"><div class="vocab-word">${esc(w)}</div><span class="vocab-count">${n}×</span></div>`)
           .join('');
       }
 
@@ -1837,7 +1847,7 @@
           const flagged = i === 0 && count / total > 0.3 ? 'flagged' : '';
           return `<div class="web-row ${flagged}">
             <span class="web-rank">${String(i + 1).padStart(2, '0')}</span>
-            <span class="web-handle">@${handle}</span>
+            <span class="web-handle">@${esc(handle)}</span>
             <div class="web-bar" style="--pct:${pct}%"></div>
             <span class="web-count">${count}</span>
           </div>`;

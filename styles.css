@@ -393,4 +393,61 @@ footer a:hover {
     aspect-ratio: auto;
     min-height: 220px;
   }
+
+  /* ── Editor Specifics ── */
+  .editor-page {
+    /* This ensures the editor looks like a-separate-app-module */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .workstation {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .canvas-container {
+    flex: 1;
+    background: #000;
+    /* Pure black for-the-image-to-pop */
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .control-panel {
+    width: 300px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    height: fit-content;
+  }
+
+  .mini-input {
+    background: var(--bg);
+    border: 1px solid var-border;
+    color: var(--accent);
+    padding: 0.5rem;
+    width: 60px;
+    text-align: center;
+  }
+
+  .btn-accent {
+    width: 100%;
+    padding: 1rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 900;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Unbounded', sans-serif;
+  }
 }

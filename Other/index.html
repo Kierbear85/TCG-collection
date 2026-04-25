@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="editor-page">
+  <header>
+    <div class="site-label">Lab_v1 // 01</div>
+    <h1>Image<span>Processor</span></h1>
+  </header>
+
+  <main class="page-content">
+    <!-- THE WORKSTATION -->
+    <div class="workstation">
+
+      <!-- The Canvas: This is where the image lives -->
+      <div class="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+        <div class="canvas-overlay">
+          <span class="tag secondary">2400 x 1600 px</span>
+        </div>
+      </div>
+
+      <!-- The Control Panel: Floating UI -->
+      <aside class="control-panel">
+        <div class="control-group">
+          <label>Dimensions</label>
+          <div class="input-row">
+            <input type="number" placeholder="W" class="mini-input">
+            <span>/</span>
+            <input type="number" placeholder="H" class="mini-input">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Action</label>
+          <button class="btn-accent">Apply Crop</button>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+</body>

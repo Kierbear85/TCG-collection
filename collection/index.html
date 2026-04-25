@@ -121,6 +121,23 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      margin: -0.2rem -0.4rem;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .legend-item:hover {
+      color: var(--text);
+    }
+
+    .legend-item.active {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .legend-item.active .legend-dot {
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
     }
 
     .legend-dot {
@@ -258,10 +275,16 @@
       padding: 0.1rem 0.32rem;
     }
 
-    .status-dot {
+    .status-dots {
       position: absolute;
       top: 7px;
       right: 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .status-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
@@ -280,8 +303,13 @@
       background: #f05080;
     }
 
-    .status-dot.sold {
+    .status-dot.sold,
+    .status-dot.traded-away {
       background: var(--muted);
+    }
+
+    .status-dot.for-sale {
+      background: #ffaa50;
     }
 
     .card-meta {
@@ -328,6 +356,17 @@
     .tag.wanted {
       border-color: #f05080;
       color: #f05080;
+    }
+
+    .tag.for-sale {
+      border-color: #ffaa50;
+      color: #ffaa50;
+    }
+
+    .tag.sold,
+    .tag.traded-away {
+      border-color: var(--muted);
+      color: var(--muted);
     }
 
     .state {
@@ -629,6 +668,163 @@
       text-decoration: underline;
     }
 
+    /* ── Auth ── */
+    .auth-popup {
+      position: fixed;
+      top: 70px;
+      right: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      z-index: 400;
+      width: 280px;
+      display: none;
+      flex-direction: column;
+      gap: 0.55rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .auth-popup.open {
+      display: flex;
+    }
+
+    .auth-error {
+      font-size: 0.58rem;
+      color: #f05080;
+      letter-spacing: 0.04em;
+      min-height: 0.7rem;
+    }
+
+    .auth-hint {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .auth-hint a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .pill.you {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Edit panel ── */
+    .edit-instance {
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-top: 0.4rem;
+    }
+
+    .edit-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .edit-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      min-width: 70px;
+    }
+
+    .edit-select,
+    .edit-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      padding: 0.3rem 0.5rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .edit-select:focus,
+    .edit-input:focus {
+      border-color: var(--accent);
+    }
+
+    .edit-checkbox-group {
+      display: flex;
+      gap: 0.85rem;
+    }
+
+    .edit-checkbox-group label {
+      font-size: 0.62rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 0.2rem;
+    }
+
+    .edit-save,
+    .edit-delete {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .edit-save:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .edit-delete {
+      border-color: #f05080;
+      color: #f05080;
+    }
+
+    .edit-delete:hover {
+      background: #f05080;
+      color: var(--bg);
+    }
+
+    .edit-save:disabled,
+    .edit-delete:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .edit-status {
+      font-size: 0.58rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .edit-status.ok {
+      color: var(--accent);
+    }
+
+    .edit-status.err {
+      color: #f05080;
+    }
+
     @media (max-width: 520px) {
       .modal-body {
         grid-template-columns: 1fr;
@@ -707,13 +903,26 @@
         <button class="pill" data-sort="rarity">rarity</button>
       </div>
     </div>
+
+    <div class="control-group" style="margin-left:auto">
+      <button class="pill" id="auth-pill">sign in</button>
+    </div>
+  </div>
+
+  <div class="auth-popup" id="auth-popup">
+    <input type="text" id="auth-identifier" placeholder="handle (e.g. nug.monster)" class="key-input" autocomplete="username">
+    <input type="password" id="auth-password" placeholder="app password" class="key-input" autocomplete="current-password">
+    <button class="key-submit" id="auth-submit">sign in</button>
+    <span class="auth-error" id="auth-error"></span>
+    <span class="auth-hint">use a bluesky <a href="https://bsky.app/settings/app-passwords" target="_blank" rel="noopener noreferrer">app password</a>, not your account password</span>
   </div>
 
   <div class="legend">
-    <span class="legend-item"><span class="legend-dot" style="background:#c8f050"></span>owned</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#50f0c8"></span>for trade</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#f05080"></span>wanted</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#5a5a7a"></span>sold</span>
+    <span class="legend-item" data-filter="owned"><span class="legend-dot" style="background:#c8f050"></span>owned</span>
+    <span class="legend-item" data-filter="for-trade"><span class="legend-dot" style="background:#50f0c8"></span>for trade</span>
+    <span class="legend-item" data-filter="for-sale"><span class="legend-dot" style="background:#ffaa50"></span>for sale</span>
+    <span class="legend-item" data-filter="wanted"><span class="legend-dot" style="background:#f05080"></span>wanted</span>
+    <span class="legend-item" data-filter="sold"><span class="legend-dot" style="background:#5a5a7a"></span>sold</span>
   </div>
 
   <main id="main">
@@ -724,10 +933,10 @@
   </main>
 
   <footer>
-    <span>nug.monster · <a href="https://bsky.app/profile/nug.monster" target="_blank">@nug.monster on
+    <span>nug.monster · <a href="https://bsky.app/profile/nug.monster" target="_blank" rel="noopener noreferrer">@nug.monster on
         bluesky</a></span>
-    <span>data via <a href="https://tcgdex.dev" target="_blank">tcgdex</a> · stored on <a href="https://atproto.com"
-        target="_blank">at protocol</a></span>
+    <span>data via <a href="https://tcgdex.dev" target="_blank" rel="noopener noreferrer">tcgdex</a> · stored on <a href="https://atproto.com"
+        target="_blank" rel="noopener noreferrer">at protocol</a></span>
   </footer>
 
   <div class="modal-overlay" id="modal-overlay">
@@ -741,6 +950,24 @@
     const HANDLE = 'nug.monster'
     const COLLECTION = 'com.kieran.tcg.cardInstance'
     const API_BASE = `https://bsky.social/xrpc/com.atproto.repo.listRecords?repo=${HANDLE}&collection=${COLLECTION}&limit=100`
+
+    // Escape user/API-controlled strings before dropping them into innerHTML.
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+    }
+
+    // Only permit http(s) URLs — blocks javascript:, data:, vbscript: payloads.
+    function safeUrl(u) {
+      try {
+        const parsed = new URL(u, window.location.href)
+        return (parsed.protocol === 'https:' || parsed.protocol === 'http:') ? parsed.href : ''
+      } catch { return '' }
+    }
 
     const RARITY_RANK = {
       'hyper rare': 0,
@@ -840,7 +1067,49 @@
     let allCards = []
     let currentSort = 'newest'
     let currentSetFilter = 'all'
+    let currentStateFilter = null  // null = all states; otherwise 'owned' | 'for-trade' | 'for-sale' | 'wanted' | 'sold'
     let collapsedSets = new Set()
+
+    // Filter is applied per-instance: a card record matches when its own
+    // ownership/availability includes the chosen state. Multi-copy cards then
+    // re-dedupe to whichever instances passed, so "for trade" hides the owned
+    // copies of a card you own + offer one of.
+    function matchesStateFilter(card) {
+      if (!currentStateFilter) return true
+      const { ownership, availability } = normalizeCard(card)
+      if (currentStateFilter === 'for-trade' || currentStateFilter === 'for-sale') {
+        return availability.includes(currentStateFilter)
+      }
+      return ownership === currentStateFilter
+    }
+
+    // Reads either the new {ownership, availability} shape or legacy {status} and
+    // returns the normalized form. Old records keep working until migrated.
+    function normalizeCard(card) {
+      if (card.ownership !== undefined) {
+        return {
+          ownership: card.ownership,
+          availability: Array.isArray(card.availability) ? card.availability : [],
+        }
+      }
+      const s = (card.status || 'owned').toLowerCase()
+      if (s === 'sold') return { ownership: 'sold', availability: [] }
+      if (s === 'traded' || s === 'traded-away') return { ownership: 'traded-away', availability: [] }
+      if (s === 'wanted') return { ownership: 'wanted', availability: [] }
+      if (s === 'for-trade') return { ownership: 'owned', availability: ['for-trade'] }
+      if (s === 'for-sale') return { ownership: 'owned', availability: ['for-sale'] }
+      return { ownership: 'owned', availability: [] }
+    }
+
+    // Picks the single state to drive the small dot in the corner of the card tile.
+    // Availability flags win because they're the actionable signal; ownership is
+    // shown anyway via the tag below the image.
+    function primaryStatus(card) {
+      const { ownership, availability } = normalizeCard(card)
+      if (availability.includes('for-sale')) return 'for-sale'
+      if (availability.includes('for-trade')) return 'for-trade'
+      return ownership
+    }
 
     async function fetchCollection() {
       try {
@@ -856,8 +1125,14 @@
           cursor = data.cursor
         } while (cursor)
 
-        // _index preserves insertion order; higher = more recently added
-        allCards = records.map((r, i) => ({ ...r.value, _index: i }))
+        // _index preserves insertion order; higher = more recently added.
+        // _rkey is needed to call putRecord on the right record when editing.
+        allCards = records.map((r, i) => ({
+          ...r.value,
+          _index: i,
+          _uri: r.uri,
+          _rkey: r.uri.split('/').pop(),
+        }))
 
         if (!allCards.length) {
           document.getElementById('main').innerHTML = `<div class="state"><span>no cards in collection yet</span></div>`
@@ -872,7 +1147,7 @@
         document.getElementById('main').innerHTML = `
         <div class="state" style="color:#f05080">
           <span>failed to load collection</span>
-          <span style="color:var(--muted);font-size:0.65rem">${err.message}</span>
+          <span style="color:var(--muted);font-size:0.65rem">${esc(err.message)}</span>
         </div>`
       }
     }
@@ -902,14 +1177,19 @@
     }
 
     function deduplicateCards(cards) {
-      const counts = new Map()
+      const groups = new Map()
       const reps = new Map()
       for (const card of cards) {
         const key = card.id || card.name
-        counts.set(key, (counts.get(key) || 0) + 1)
+        if (!groups.has(key)) groups.set(key, [])
+        groups.get(key).push(card)
         if (!reps.has(key) || card._index > reps.get(key)._index) reps.set(key, card)
       }
-      return [...reps.values()].map(c => ({ ...c, _count: counts.get(c.id || c.name) }))
+      return [...reps.values()].map(c => {
+        const key = c.id || c.name
+        const insts = groups.get(key)
+        return { ...c, _count: insts.length, _instances: insts }
+      })
     }
 
     function groupBySet(cards) {
@@ -939,12 +1219,15 @@
     }
 
     function render() {
-      const filtered = currentSetFilter === 'all'
-        ? allCards
-        : allCards.filter(c => c.set === currentSetFilter)
+      const filtered = allCards.filter(c =>
+        (currentSetFilter === 'all' || c.set === currentSetFilter) &&
+        matchesStateFilter(c)
+      )
 
       const badge = document.getElementById('count-badge')
-      badge.innerHTML = `<strong>${filtered.length}</strong> card${filtered.length !== 1 ? 's' : ''}${currentSetFilter !== 'all' ? ` · <strong>${currentSetFilter}</strong>` : ''}`
+      const setLabel = currentSetFilter !== 'all' ? ` · <strong>${esc(currentSetFilter)}</strong>` : ''
+      const stateLabel = currentStateFilter ? ` · <strong>${esc(currentStateFilter)}</strong>` : ''
+      badge.innerHTML = `<strong>${filtered.length}</strong> card${filtered.length !== 1 ? 's' : ''}${setLabel}${stateLabel}`
 
       if (!filtered.length) {
         document.getElementById('main').innerHTML = `<div class="state"><span>no cards match current filter</span></div>`
@@ -969,7 +1252,7 @@
 
         group.innerHTML = `
         <div class="set-header">
-          <span class="set-name">${setName}</span>
+          <span class="set-name">${esc(setName)}</span>
           <span class="set-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</span>
           <span class="set-toggle">${isCollapsed ? '▸ expand' : '▾ collapse'}</span>
         </div>
@@ -999,23 +1282,42 @@
     }
 
     function cardHTML(card, i) {
-      const status = card.status || 'owned'
-      const condition = card.condition || ''
+      const { ownership, availability } = normalizeCard(card)
+      const condition = esc(card.condition || '')
+      const name = esc(card.name)
+      const imgSrc = safeUrl(card.image)
       const delay = Math.min(i * 25, 500)
-      const hasImg = !!card.image
+      const hasImg = !!imgSrc
+
+      // One dot per physical instance, each colored by that instance's own
+      // primary status — so 4 copies = 4 dots stacked vertically.
+      const instances = card._instances || [card]
+      const dotsHTML = instances
+        .map(inst => `<div class="status-dot ${esc(primaryStatus(inst))}"></div>`)
+        .join('')
+
+      // Aggregate tags across all instances so the per-card list reflects every
+      // distinct ownership/availability state present (e.g. "owned, sold").
+      const tagSet = new Set()
+      for (const inst of instances) {
+        const n = normalizeCard(inst)
+        tagSet.add(n.ownership)
+        for (const a of n.availability) tagSet.add(a)
+      }
+      const tags = [...tagSet]
 
       return `
       <div class="card" data-card-idx="${card._index}" style="animation-delay:${delay}ms;cursor:pointer">
         <div class="card-img-wrap">
-          ${hasImg ? `<img src="${card.image}" alt="${card.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.no-image').style.display='flex'">` : ''}
+          ${hasImg ? `<img src="${imgSrc}" alt="${name}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.no-image').style.display='flex'">` : ''}
           <div class="no-image" style="display:${hasImg ? 'none' : 'flex'}">no image</div>
-          <div class="status-dot ${status}"></div>
+          <div class="status-dots">${dotsHTML}</div>
           ${card._count > 1 ? `<div class="card-count">×${card._count}</div>` : ''}
         </div>
         <div class="card-meta">
-          <div class="card-name" title="${card.name}">${card.name}</div>
+          <div class="card-name" title="${name}">${name}</div>
           <div class="card-tags">
-            <span class="tag ${status}">${status}</span>
+            ${tags.map(t => `<span class="tag ${esc(t)}">${esc(t)}</span>`).join('')}
             ${condition ? `<span class="tag">${condition}</span>` : ''}
           </div>
         </div>
@@ -1026,6 +1328,18 @@
     document.getElementById('set-filter').addEventListener('change', e => {
       currentSetFilter = e.target.value
       render()
+    })
+
+    document.querySelectorAll('.legend-item[data-filter]').forEach(el => {
+      el.addEventListener('click', () => {
+        const f = el.dataset.filter
+        // Click the active filter again to clear it, otherwise switch to the new one.
+        currentStateFilter = currentStateFilter === f ? null : f
+        document.querySelectorAll('.legend-item[data-filter]').forEach(li =>
+          li.classList.toggle('active', li.dataset.filter === currentStateFilter)
+        )
+        render()
+      })
     })
 
     document.querySelectorAll('.pill[data-sort]').forEach(btn => {
@@ -1047,6 +1361,10 @@
     const modalOverlay = document.getElementById('modal-overlay')
     const modalClose = document.getElementById('modal-close')
     const modalContent = document.getElementById('modal-content')
+    // WARNING: any key shipped to the browser is public. This is a test-tier
+    // Pokewallet key; rotate it if it ever leaks to an untrusted party, and
+    // lock it down with a referrer/domain restriction in the PW dashboard.
+    // For anything sensitive, proxy the call through a server-side endpoint.
     const PW_API_KEY = 'pk_test_1b978aafde6eee1b9093b59bbb57c04d49c86583c9afa23f'
 
     let modalCurrency = 'USD'
@@ -1148,10 +1466,11 @@
 
       return prices.map((p, i) => {
         const cv = v => toDisplay(v, sourceCurrency)
+        const variant = p.sub_type_name || p.variant_type
         return `
         <div class="price-block">
           ${i === 0 ? `<div class="modal-section-title">${label}</div>` : ''}
-          ${p.sub_type_name || p.variant_type ? `<div class="price-variant">${p.sub_type_name || p.variant_type}</div>` : ''}
+          ${variant ? `<div class="price-variant">${esc(variant)}</div>` : ''}
           ${fields.main && cv(p[fields.main]) != null ? `<div class="price-market">${sym}${cv(p[fields.main]).toFixed(2)} <small>${fields.mainLabel}</small></div>` : ''}
           ${fields.rows.filter(([k]) => cv(p[k]) != null).map(([k, lbl]) =>
           `<div class="price-row"><span class="lbl">${lbl}</span><span class="val">${sym}${cv(p[k]).toFixed(2)}</span></div>`
@@ -1172,26 +1491,25 @@
       const rc = rarityColor(info.rarity)
       const attacks = info.attacks || []
 
+      const cardImg = safeUrl(card.image)
+      const tcgUrl = safeUrl(tcg?.url)
+
       modalContent.innerHTML = `
         <div class="modal-body">
           <div class="modal-img">
-            ${card.image ? `<img src="${card.image}" alt="${card.name}" onerror="this.style.display='none'">` : ''}
+            ${cardImg ? `<img src="${cardImg}" alt="${esc(card.name)}" onerror="this.style.display='none'">` : ''}
           </div>
           <div class="modal-info">
-            <div class="modal-name">${info.name || card.name}</div>
+            <div class="modal-name">${esc(info.name || card.name)}</div>
             <div class="modal-meta">
-              <span>${info.set_name || card.set}${info.card_number ? ` · #${info.card_number}` : ''}</span>
-              ${info.HP ? `<span>${info.HP} HP</span>` : ''}
+              <span>${esc(info.set_name || card.set)}${info.card_number ? ` · #${esc(info.card_number)}` : ''}</span>
+              ${info.HP ? `<span>${esc(info.HP)} HP</span>` : ''}
             </div>
-            ${info.rarity ? `<span class="rarity-badge" style="color:${rc};border-color:${rc}">${info.rarity}</span>` : ''}
+            ${info.rarity ? `<span class="rarity-badge" style="color:${rc};border-color:${rc}">${esc(info.rarity)}</span>` : ''}
             <div>
               <div class="modal-section-title">collection${card._count > 1 ? ` · ${card._count} copies` : ''}</div>
               <div style="display:flex;flex-direction:column;gap:0.3rem">
-                ${(card._instances || [card]).map(inst => `
-                  <div style="font-size:0.62rem;color:var(--muted);display:flex;gap:1rem">
-                    <span>condition <span style="color:var(--text)">${inst.condition || '—'}</span></span>
-                    <span>status <span style="color:var(--text)">${inst.status || '—'}</span></span>
-                  </div>`).join('')}
+                ${(card._instances || [card]).map(inst => instanceRowHTML(inst)).join('')}
               </div>
             </div>
             ${attacks.length ? `
@@ -1201,10 +1519,10 @@
                 ${attacks.map(a => `
                   <div class="attack-item">
                     <div class="attack-header">
-                      <span>${a.name || ''}</span>
-                      ${a.damage ? `<span class="attack-dmg">${a.damage}</span>` : ''}
+                      <span>${esc(a.name || '')}</span>
+                      ${a.damage ? `<span class="attack-dmg">${esc(a.damage)}</span>` : ''}
                     </div>
-                    ${a.text ? `<div class="attack-text">${a.text}</div>` : ''}
+                    ${a.text ? `<div class="attack-text">${esc(a.text)}</div>` : ''}
                   </div>`).join('')}
               </div>
             </div>` : ''}
@@ -1227,7 +1545,7 @@
         rows: [['trend', 'trend'], ['avg30', '30d avg'], ['low', 'low']]
       })}
         </div>
-        ${tcg?.url ? `<div class="tcg-link"><a href="${tcg.url}" target="_blank">view on tcgplayer →</a></div>` : ''}
+        ${tcgUrl ? `<div class="tcg-link"><a href="${tcgUrl}" target="_blank" rel="noopener noreferrer">view on tcgplayer →</a></div>` : ''}
       `
     }
 
@@ -1281,13 +1599,13 @@
         if (!match) match = results[0]
 
         if (!match) {
-          modalContent.innerHTML = `<div class="modal-state">No pricing data found for "${card.name}".</div>`
+          modalContent.innerHTML = `<div class="modal-state">No pricing data found for "${esc(card.name)}".</div>`
           return
         }
 
         renderCardDetails(card, match, cardType)
       } catch (err) {
-        modalContent.innerHTML = `<div class="modal-state" style="color:#f05080">Failed to load: ${err.message}</div>`
+        modalContent.innerHTML = `<div class="modal-state" style="color:#f05080">Failed to load: ${esc(err.message)}</div>`
       }
     }
 
@@ -1307,8 +1625,347 @@
       openModal({ ...card, _count: instances.length, _instances: instances })
     })
 
+    // ── Auth ────────────────────────────────────────────────────────────────
+    // Owner of this collection — only this handle gets the edit UI.
+    const OWNER_HANDLE = 'nug.monster'
+    const PDS_ENDPOINT = 'https://bsky.social'
+    const SESSION_KEY = 'tcg.session.v1'
+
+    let session = null
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY)
+      if (stored) session = JSON.parse(stored)
+    } catch { /* ignore corrupt session */ }
+
+    function isOwner() {
+      return session?.handle === OWNER_HANDLE
+    }
+
+    async function login(identifier, password) {
+      const res = await fetch(`${PDS_ENDPOINT}/xrpc/com.atproto.server.createSession`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.message || `Login failed (${res.status})`)
+      }
+      const data = await res.json()
+      session = {
+        did: data.did,
+        handle: data.handle,
+        accessJwt: data.accessJwt,
+        refreshJwt: data.refreshJwt,
+      }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
+      renderAuthState()
+    }
+
+    function logout() {
+      session = null
+      sessionStorage.removeItem(SESSION_KEY)
+      renderAuthState()
+    }
+
+    // Access tokens are short-lived; on 401 try the refresh JWT once before giving up.
+    async function refreshSession() {
+      if (!session?.refreshJwt) throw new Error('No refresh token')
+      const res = await fetch(`${PDS_ENDPOINT}/xrpc/com.atproto.server.refreshSession`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session.refreshJwt}` },
+      })
+      if (!res.ok) {
+        logout()
+        throw new Error('Session expired — please sign in again')
+      }
+      const data = await res.json()
+      session = { ...session, accessJwt: data.accessJwt, refreshJwt: data.refreshJwt }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
+    }
+
+    async function authedFetch(url, opts = {}) {
+      const doFetch = () => fetch(url, {
+        ...opts,
+        headers: {
+          ...(opts.headers || {}),
+          'Authorization': `Bearer ${session.accessJwt}`,
+        },
+      })
+      let res = await doFetch()
+      if (res.status === 401) {
+        await refreshSession()
+        res = await doFetch()
+      }
+      return res
+    }
+
+    async function putRecord(rkey, value) {
+      if (!session) throw new Error('Not signed in')
+      const res = await authedFetch(`${PDS_ENDPOINT}/xrpc/com.atproto.repo.putRecord`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repo: session.did,
+          collection: COLLECTION,
+          rkey,
+          record: value,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.message || `Save failed (${res.status})`)
+      }
+      return res.json()
+    }
+
+    async function deleteRecord(rkey) {
+      if (!session) throw new Error('Not signed in')
+      const res = await authedFetch(`${PDS_ENDPOINT}/xrpc/com.atproto.repo.deleteRecord`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repo: session.did,
+          collection: COLLECTION,
+          rkey,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.message || `Delete failed (${res.status})`)
+      }
+      return res.json()
+    }
+
+    function renderAuthState() {
+      const pill = document.getElementById('auth-pill')
+      if (session) {
+        pill.textContent = `${session.handle} · sign out`
+        pill.classList.toggle('you', isOwner())
+      } else {
+        pill.textContent = 'sign in'
+        pill.classList.remove('you')
+      }
+      document.getElementById('auth-popup').classList.remove('open')
+      // Re-render the grid to show/hide owner-only state if needed, and the
+      // open modal so its edit UI appears or disappears.
+      if (allCards.length) render()
+      if (lastCard && lastPwData) renderCardDetails(lastCard, lastPwData)
+    }
+
+    document.getElementById('auth-pill').addEventListener('click', () => {
+      if (session) {
+        logout()
+        return
+      }
+      const popup = document.getElementById('auth-popup')
+      popup.classList.toggle('open')
+      document.getElementById('auth-error').textContent = ''
+      if (popup.classList.contains('open')) {
+        document.getElementById('auth-identifier').focus()
+      }
+    })
+
+    async function handleLogin() {
+      const id = document.getElementById('auth-identifier').value.trim()
+      const pw = document.getElementById('auth-password').value
+      const err = document.getElementById('auth-error')
+      err.textContent = ''
+      if (!id || !pw) { err.textContent = 'enter handle and app password'; return }
+      const submit = document.getElementById('auth-submit')
+      submit.disabled = true
+      submit.textContent = 'signing in...'
+      try {
+        await login(id, pw)
+        document.getElementById('auth-password').value = ''
+      } catch (e) {
+        err.textContent = e.message
+      } finally {
+        submit.disabled = false
+        submit.textContent = 'sign in'
+      }
+    }
+
+    document.getElementById('auth-submit').addEventListener('click', handleLogin)
+    document.getElementById('auth-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin()
+    })
+    document.getElementById('auth-identifier').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin()
+    })
+
+    // ── Edit instance row ───────────────────────────────────────────────────
+    // Renders one instance: read-only for non-owners, full edit form for the owner.
+    function instanceRowHTML(inst) {
+      const { ownership, availability } = normalizeCard(inst)
+      if (!isOwner()) {
+        const extra = availability.length ? ` · ${availability.join(', ')}` : ''
+        return `
+          <div style="font-size:0.62rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap">
+            <span>condition <span style="color:var(--text)">${esc(inst.condition || '—')}</span></span>
+            <span>status <span style="color:var(--text)">${esc(ownership)}${esc(extra)}</span></span>
+          </div>`
+      }
+      const rkey = esc(inst._rkey || '')
+      const ownOptions = ['owned', 'sold', 'traded-away', 'wanted']
+        .map(v => `<option value="${v}" ${ownership === v ? 'selected' : ''}>${v}</option>`)
+        .join('')
+      return `
+        <div class="edit-instance" data-rkey="${rkey}">
+          <div class="edit-row">
+            <span class="edit-label">ownership</span>
+            <select class="edit-select" data-field="ownership">${ownOptions}</select>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">available</span>
+            <div class="edit-checkbox-group">
+              <label><input type="checkbox" data-flag="for-sale" ${availability.includes('for-sale') ? 'checked' : ''}> for sale</label>
+              <label><input type="checkbox" data-flag="for-trade" ${availability.includes('for-trade') ? 'checked' : ''}> for trade</label>
+            </div>
+          </div>
+          <div class="edit-row">
+            <span class="edit-label">condition</span>
+            <input class="edit-input" data-field="condition" value="${esc(inst.condition || '')}" placeholder="mint, nm, lp...">
+          </div>
+          <div class="edit-actions">
+            <button class="edit-save" data-action="save">save</button>
+            <button class="edit-delete" data-action="delete">delete</button>
+            <span class="edit-status"></span>
+          </div>
+        </div>`
+    }
+
+    // Save / delete handlers, delegated on the modal so they survive re-renders.
+    modalContent.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-action]')
+      if (!btn) return
+      const wrapper = btn.closest('.edit-instance')
+      if (!wrapper) return
+      const rkey = wrapper.dataset.rkey
+      const action = btn.dataset.action
+      const statusEl = wrapper.querySelector('.edit-status')
+      statusEl.className = 'edit-status'
+
+      const orig = allCards.find(c => c._rkey === rkey)
+      if (!orig) {
+        statusEl.classList.add('err')
+        statusEl.textContent = 'record not found'
+        return
+      }
+
+      const buttons = wrapper.querySelectorAll('button')
+      buttons.forEach(b => b.disabled = true)
+
+      try {
+        if (action === 'delete') {
+          if (!confirm(`Delete this ${orig.name} record? This removes it from your PDS — there's no undo.`)) {
+            return
+          }
+          statusEl.textContent = 'deleting...'
+          await deleteRecord(rkey)
+          const idx = allCards.findIndex(c => c._rkey === rkey)
+          if (idx >= 0) allCards.splice(idx, 1)
+          statusEl.classList.add('ok')
+          statusEl.textContent = 'deleted'
+          render()
+          // If no instances of this card remain, close the modal.
+          if (!allCards.some(c => c.id === orig.id)) {
+            setTimeout(closeModal, 400)
+          } else {
+            // Refresh modal contents so the deleted row disappears.
+            const updated = allCards.find(c => c.id === orig.id)
+            const instances = allCards.filter(c => c.id === orig.id)
+            renderCardDetails({ ...updated, _count: instances.length, _instances: instances }, lastPwData, lastCardType)
+          }
+          return
+        }
+
+        // Save flow
+        const ownership = wrapper.querySelector('[data-field="ownership"]').value
+        const condition = wrapper.querySelector('[data-field="condition"]').value.trim()
+        const flags = [...wrapper.querySelectorAll('[data-flag]')]
+          .filter(cb => cb.checked).map(cb => cb.dataset.flag)
+        // Availability is only meaningful while owned — clear it otherwise so
+        // we never persist impossible states like "sold + for-sale".
+        const availability = ownership === 'owned' ? flags : []
+
+        statusEl.textContent = 'saving...'
+
+        const updated = { ...orig }
+        delete updated._index
+        delete updated._uri
+        delete updated._rkey
+        delete updated.status  // drop legacy field on save
+        updated.ownership = ownership
+        updated.availability = availability
+        if (condition) updated.condition = condition
+        else delete updated.condition
+        updated.updatedAt = new Date().toISOString()
+
+        await putRecord(rkey, updated)
+
+        // Replace local cache entry so subsequent renders see the new shape.
+        const idx = allCards.findIndex(c => c._rkey === rkey)
+        if (idx >= 0) {
+          const old = allCards[idx]
+          allCards[idx] = { ...updated, _index: old._index, _uri: old._uri, _rkey: old._rkey }
+        }
+
+        statusEl.classList.add('ok')
+        statusEl.textContent = 'saved'
+        render()
+      } catch (err) {
+        statusEl.classList.add('err')
+        statusEl.textContent = err.message
+      } finally {
+        buttons.forEach(b => b.disabled = false)
+      }
+    })
+
+    // ── Migration helper (console-exposed) ──────────────────────────────────
+    // Run `await migrateCollection()` in the browser console once you're
+    // signed in as the owner. Walks every legacy record and rewrites it in the
+    // new {ownership, availability} shape at the same rkey. Safe to re-run.
+    async function migrateCollection() {
+      if (!isOwner()) throw new Error('Sign in as the owner first')
+      const toMigrate = allCards.filter(c => c.ownership === undefined)
+      if (!toMigrate.length) {
+        console.log('Nothing to migrate — all records already use the new shape.')
+        return
+      }
+      console.log(`Migrating ${toMigrate.length} records...`)
+      let ok = 0, fail = 0
+      for (const card of toMigrate) {
+        const norm = normalizeCard(card)
+        const updated = { ...card }
+        delete updated._index
+        delete updated._uri
+        delete updated._rkey
+        delete updated.status
+        updated.ownership = norm.ownership
+        updated.availability = norm.availability
+        updated.updatedAt = new Date().toISOString()
+        try {
+          await putRecord(card._rkey, updated)
+          const idx = allCards.findIndex(c => c._rkey === card._rkey)
+          if (idx >= 0) {
+            allCards[idx] = { ...updated, _index: card._index, _uri: card._uri, _rkey: card._rkey }
+          }
+          ok++
+          console.log(`✓ ${card.id} ${card.name}`)
+        } catch (e) {
+          fail++
+          console.warn(`✗ ${card.id} ${card.name}: ${e.message}`)
+        }
+      }
+      console.log(`Done. ${ok} migrated, ${fail} failed.`)
+      render()
+    }
+    window.migrateCollection = migrateCollection
+
     // ── Fetch collection ────────────────────────────────────────────────────
 
+    renderAuthState()
     fetchCollection()
   </script>
 </body>
